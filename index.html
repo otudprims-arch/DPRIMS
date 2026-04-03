@@ -1,0 +1,2570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DPRIMS — Dual-Phase Rail Inspection & Monitoring System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   CSS VARIABLES & RESET
+   ============================================================ */
+:root {
+  --primary:     #2563EB;
+  --primary-dark:#1D4ED8;
+  --primary-glow:#2563EB22;
+  --secondary:   #0EA5E9;
+  --accent:      #14B8A6;
+  --alert:       #EF4444;
+  --warning:     #F59E0B;
+  --success:     #10B981;
+  --bg:          #F8FAFC;
+  --bg-alt:      #F1F5F9;
+  --surface:     #FFFFFF;
+  --border:      #E2E8F0;
+  --border-strong:#CBD5E1;
+  --text-primary:#0F172A;
+  --text-secondary:#475569;
+  --text-muted:  #94A3B8;
+  --code-bg:     #F1F5F9;
+  --code-border: #E2E8F0;
+  --code-key:    #2563EB;
+  --code-str:    #059669;
+  --code-comment:#94A3B8;
+  --code-hi:     #7C3AED;
+  --radius-sm:   8px;
+  --radius:      12px;
+  --radius-lg:   18px;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow:      0 4px 16px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:   0 12px 40px rgba(37,99,235,.12), 0 4px 12px rgba(0,0,0,.06);
+  --transition:  .2s cubic-bezier(.4,0,.2,1);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.75;
+  font-size: 15px;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 40%, #0F172A 100%);
+  padding: 70px 20px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle grid overlay */
+.hero::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(37,99,235,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;
+}
+
+/* glow blobs */
+.hero::after {
+  content:'';
+  position:absolute;
+  width:600px; height:600px;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(37,99,235,.18) 0%, transparent 70%);
+  top:-200px; left:50%; transform:translateX(-50%);
+  pointer-events:none;
+}
+
+.hero-inner { position:relative; z-index:1; max-width:900px; margin:0 auto; }
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(37,99,235,.15);
+  border: 1px solid rgba(37,99,235,.3);
+  color: #93C5FD;
+  font-size: .78em;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 28px;
+}
+
+.hero h1 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(2.8em, 7vw, 5em);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.05;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #FFFFFF 30%, #93C5FD 70%, #67E8F9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 1.05em;
+  color: #94A3B8;
+  max-width: 600px;
+  margin: 0 auto 32px;
+  font-weight: 400;
+}
+
+.hero-badges {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.hero-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #CBD5E1;
+  font-size: .8em;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.hero-badge:hover {
+  background: rgba(37,99,235,.2);
+  border-color: rgba(37,99,235,.4);
+  color: #93C5FD;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-num {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.8em;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: .75em;
+  color: #64748B;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,.1);
+  align-self: center;
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+.nav {
+  background: rgba(255,255,255,.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: .8em;
+  font-weight: 600;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.nav a:hover {
+  background: var(--primary-glow);
+  color: var(--primary);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  margin: 24px 0;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+
+.section:hover {
+  box-shadow: var(--shadow);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-icon {
+  width: 44px; height: 44px;
+  background: var(--primary-glow);
+  border: 1px solid rgba(37,99,235,.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3em;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.25em;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -.01em;
+}
+
+.section-subtitle {
+  font-size: .82em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.section-label {
+  margin-right: auto;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: .7em;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 3px 10px;
+  border-radius: 100px;
+  letter-spacing: .05em;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.cards-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content:'';
+  position:absolute;
+  inset:0; bottom:auto;
+  height:2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  opacity:0;
+  transition: opacity var(--transition);
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.card:hover::before { opacity:1; }
+
+.card-icon {
+  font-size: 1.8em;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.card h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .95em;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: .83em;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.card-accent { border-color: rgba(37,99,235,.2); background: rgba(37,99,235,.03); }
+.card-accent:hover { border-color: var(--primary); }
+
+/* ============================================================
+   CODE BLOCKS
+   ============================================================ */
+.code-wrap {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 14px 0;
+}
+
+.code-header {
+  background: var(--border);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.code-dots { display:flex; gap:5px; }
+.code-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+
+.code-dot:nth-child(1) { background: #EF4444; }
+.code-dot:nth-child(2) { background: #F59E0B; }
+.code-dot:nth-child(3) { background: #10B981; }
+
+.code-file {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7em;
+  color: var(--text-muted);
+  margin-right: 8px;
+}
+
+.code-block {
+  padding: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82em;
+  color: #334155;
+  overflow-x: auto;
+  white-space: pre;
+  direction: ltr;
+  text-align: left;
+  line-height: 1.7;
+}
+
+.kw  { color: var(--code-key);     font-weight: 600; }
+.str { color: var(--code-str); }
+.cmt { color: var(--code-comment); font-style: italic; }
+.hi  { color: var(--code-hi);      font-weight: 600; }
+.num { color: #D97706; }
+
+/* ============================================================
+   ARCHITECTURE DIAGRAM
+   ============================================================ */
+.arch-wrap {
+  background: #0F172A;
+  border: 1px solid rgba(37,99,235,.2);
+  border-radius: var(--radius);
+  padding: 28px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82em;
+  direction: ltr;
+  text-align: left;
+  overflow-x: auto;
+  line-height: 1.8;
+}
+
+.arch-wrap .a-green  { color: #34D399; }
+.arch-wrap .a-blue   { color: #60A5FA; }
+.arch-wrap .a-yellow { color: #FCD34D; }
+.arch-wrap .a-red    { color: #FCA5A5; }
+.arch-wrap .a-purple { color: #C4B5FD; }
+.arch-wrap .a-teal   { color: #2DD4BF; }
+.arch-wrap .a-gray   { color: #94A3B8; }
+.arch-wrap .a-orange { color: #FB923C; }
+.arch-wrap .a-white  { color: #F8FAFC; }
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.table-wrap { overflow-x: auto; margin: 14px 0; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+
+table { width:100%; border-collapse:collapse; font-size:.85em; }
+
+thead th {
+  background: var(--bg-alt);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: .78em;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr:hover td { background: var(--bg-alt); }
+
+.price { color: var(--success); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: .72em;
+  font-weight: 700;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+
+.tag-power   { background: #FEF3C7; color:#D97706; border:1px solid #FDE68A; }
+.tag-control { background: #DBEAFE; color:#2563EB; border:1px solid #BFDBFE; }
+.tag-sensor  { background: #D1FAE5; color:#059669; border:1px solid #A7F3D0; }
+.tag-connect { background: #EDE9FE; color:#7C3AED; border:1px solid #DDD6FE; }
+.tag-ai      { background: #FCE7F3; color:#DB2777; border:1px solid #FBCFE8; }
+
+/* ============================================================
+   SEVERITY CARDS
+   ============================================================ */
+.sev-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; }
+
+.sev-card {
+  border-radius: var(--radius);
+  padding: 22px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.sev-low    { background:#ECFDF5; border-color:#A7F3D0; }
+.sev-medium { background:#FFFBEB; border-color:#FDE68A; }
+.sev-high   { background:#FEF2F2; border-color:#FECACA; }
+
+.sev-label {
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:1em; font-weight:800;
+  margin-bottom:12px;
+}
+
+.sev-low .sev-label    { color:#059669; }
+.sev-medium .sev-label { color:#D97706; }
+.sev-high .sev-label   { color:#DC2626; }
+
+.sev-items {
+  font-size:.85em;
+  color:var(--text-secondary);
+  line-height:1.7;
+  margin-bottom:14px;
+}
+
+.sev-action {
+  font-size:.8em;
+  font-weight:700;
+  padding:6px 12px;
+  border-radius:6px;
+}
+
+.sev-low .sev-action    { background:#D1FAE5; color:#059669; }
+.sev-medium .sev-action { background:#FEF3C7; color:#D97706; }
+.sev-high .sev-action   { background:#FEE2E2; color:#DC2626; }
+
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+.timeline { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-top:8px; }
+
+.tl-item {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  position: relative;
+  transition: all var(--transition);
+}
+
+.tl-item:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+}
+
+.tl-day {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72em;
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 8px;
+}
+
+.tl-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .88em;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.tl-desc {
+  font-size: .78em;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ============================================================
+   TEAM CARDS
+   ============================================================ */
+.team-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+
+.team-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+.team-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+  transform: translateY(-3px);
+}
+
+.team-icon { font-size: 2em; margin-bottom: 10px; }
+
+.team-role {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .9em;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.team-count {
+  display: inline-block;
+  background: var(--primary-glow);
+  color: var(--primary);
+  font-size: .72em;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 12px;
+}
+
+.team-tasks {
+  font-size: .78em;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ============================================================
+   STEPS
+   ============================================================ */
+.steps-list { display:flex; flex-direction:column; gap:14px; }
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.step-num {
+  background: var(--primary);
+  color: white;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .82em;
+  flex-shrink: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.step-body h4 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: .9em;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.step-body p {
+  font-size: .82em;
+  color: var(--text-secondary);
+}
+
+.step-body code {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--primary);
+  background: var(--primary-glow);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: .9em;
+}
+
+/* ============================================================
+   INFO BOX
+   ============================================================ */
+.info-box {
+  background: rgba(37,99,235,.05);
+  border: 1px solid rgba(37,99,235,.2);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: .85em;
+  color: var(--text-secondary);
+  margin-top: 14px;
+}
+
+.info-box strong { color: var(--primary); }
+
+.warn-box {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: .85em;
+  color: #92400E;
+  margin-top: 14px;
+}
+
+/* ============================================================
+   HIGHLIGHT PILLS
+   ============================================================ */
+.pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+
+.pill {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: .78em;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pill-blue   { background:#DBEAFE; border-color:#BFDBFE; color:#1D4ED8; }
+.pill-teal   { background:#CCFBF1; border-color:#99F6E4; color:#0F766E; }
+.pill-purple { background:#EDE9FE; border-color:#DDD6FE; color:#6D28D9; }
+.pill-red    { background:#FEE2E2; border-color:#FECACA; color:#DC2626; }
+
+/* ============================================================
+   DATA FLOW DIAGRAM
+   ============================================================ */
+.flow-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 10px 0;
+}
+
+.flow-node {
+  background: var(--bg-alt);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 24px;
+  text-align: center;
+  min-width: 200px;
+  max-width: 340px;
+  width: 100%;
+  transition: all var(--transition);
+}
+
+.flow-node:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+
+.flow-node-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: .9em;
+  color: var(--text-primary);
+}
+
+.flow-node-sub {
+  font-size: .75em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.flow-node.primary { background:var(--primary); border-color:var(--primary); }
+.flow-node.primary .flow-node-title { color:#fff; }
+.flow-node.primary .flow-node-sub   { color:#BFDBFE; }
+
+.flow-arrow {
+  color: var(--text-muted);
+  font-size: 1.5em;
+  line-height: 1.2;
+  padding: 4px 0;
+  text-align: center;
+}
+
+/* ============================================================
+   RISK TABLE
+   ============================================================ */
+.risk-badge {
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:100px;
+  font-size:.72em;
+  font-weight:700;
+}
+
+.risk-high   { background:#FEE2E2; color:#DC2626; }
+.risk-medium { background:#FEF3C7; color:#D97706; }
+.risk-low    { background:#D1FAE5; color:#059669; }
+
+/* ============================================================
+   IMPACT SECTION
+   ============================================================ */
+.impact-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+
+.impact-card {
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.impact-num {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 2.4em;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.impact-desc {
+  font-size: .82em;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.ic-blue   { background:#EFF6FF; border-color:#BFDBFE; }
+.ic-teal   { background:#F0FDFA; border-color:#99F6E4; }
+.ic-green  { background:#F0FDF4; border-color:#BBF7D0; }
+.ic-red    { background:#FFF1F2; border-color:#FECDD3; }
+
+.ic-blue .impact-num   { color:var(--primary); }
+.ic-teal .impact-num   { color:var(--accent); }
+.ic-green .impact-num  { color:#16A34A; }
+.ic-red .impact-num    { color:#E11D48; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background: #0F172A;
+  color: #64748B;
+  text-align: center;
+  padding: 40px 20px;
+  font-size: .85em;
+}
+
+.footer-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #94A3B8;
+  margin-bottom: 8px;
+}
+
+.footer-sub { margin-top: 6px; }
+
+/* ============================================================
+   SECTION TAG COLORS
+   ============================================================ */
+.tag-exec      { background:#EFF6FF; color:#2563EB; }
+.tag-problem   { background:#FFF1F2; color:#E11D48; }
+.tag-solution  { background:#F0FDF4; color:#16A34A; }
+.tag-hardware  { background:#FEF3C7; color:#D97706; }
+.tag-ai        { background:#FAF5FF; color:#7C3AED; }
+.tag-software  { background:#F0FDFA; color:#0F766E; }
+.tag-risk      { background:#FFF7ED; color:#C2410C; }
+.tag-future    { background:#F5F3FF; color:#6D28D9; }
+.tag-impact    { background:#ECFDF5; color:#065F46; }
+.tag-team-sec  { background:#F0F9FF; color:#0369A1; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .hero { padding: 50px 16px 40px; }
+  .section { padding: 24px 18px; }
+  .stat-divider { display:none; }
+  .cards-grid, .cards-grid-3 { grid-template-columns:1fr; }
+  .timeline { grid-template-columns:1fr; }
+  .team-grid { grid-template-columns:repeat(2,1fr); }
+  .impact-grid { grid-template-columns:repeat(2,1fr); }
+  table { font-size:.78em; }
+  thead th, tbody td { padding:9px 10px; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size:2.2em; }
+  .team-grid { grid-template-columns:1fr; }
+  .impact-grid { grid-template-columns:1fr; }
+  .sev-grid { grid-template-columns:1fr; }
+}
+
+/* ============================================================
+   SCROLL ANIMATION (pure CSS)
+   ============================================================ */
+.section {
+  animation: fadeUp .4s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+.mt-12 { margin-top:12px; }
+.mt-20 { margin-top:20px; }
+.mt-24 { margin-top:24px; }
+.mb-12 { margin-bottom:12px; }
+.mb-20 { margin-bottom:20px; }
+.text-muted { color: var(--text-muted); font-size:.85em; }
+h3.sub-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1em;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 20px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+ul.fancy-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+ul.fancy-list li {
+  font-size: .88em;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+ul.fancy-list li::before {
+  content: '▸';
+  color: var(--primary);
+  font-size: .8em;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+hr.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <div class="hero-inner">
+
+    <div class="hero-eyebrow">
+      <span>⚡</span>
+      Graduation Project 2026 · Faculty of Engineering
+    </div>
+
+    <h1>DPRIMS</h1>
+
+    <p class="hero-sub">
+      Dual-Phase Rail Inspection &amp; Monitoring System<br>
+      نظام ذكي لفحص السكك الحديدية بالرؤية الحاسوبية والطاقة الشمسية
+    </p>
+
+    <div class="hero-badges">
+      <span class="hero-badge">🤖 YOLOv8 AI</span>
+      <span class="hero-badge">📷 Computer Vision</span>
+      <span class="hero-badge">⚡ ESP32</span>
+      <span class="hero-badge">☀️ Solar Power</span>
+      <span class="hero-badge">📡 Real-time Alerts</span>
+      <span class="hero-badge">🌐 React Dashboard</span>
+      <span class="hero-badge">🧠 SSIM Analysis</span>
+      <span class="hero-badge">🛰️ GPS Tracking</span>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">10</div>
+        <div class="stat-label">Team Members</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">10</div>
+        <div class="stat-label">Day Timeline</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">5</div>
+        <div class="stat-label">Defect Classes</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">~$87</div>
+        <div class="stat-label">Hardware Budget</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">&gt;90%</div>
+        <div class="stat-label">Target mAP</div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="nav" id="top">
+  <div class="nav-inner">
+    <a href="#exec">Executive Summary</a>
+    <a href="#problem">Problem</a>
+    <a href="#solution">Solution</a>
+    <a href="#arch">Architecture</a>
+    <a href="#hardware">Hardware</a>
+    <a href="#ai">AI Layer</a>
+    <a href="#software">Software</a>
+    <a href="#dataflow">Data Flow</a>
+    <a href="#safety">Safety</a>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#impact">Impact</a>
+    <a href="#innovation">Innovation</a>
+    <a href="#future">Future Work</a>
+    <a href="#risk">Risk Analysis</a>
+    <a href="#testing">Testing</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#team">Team</a>
+    <a href="#shopping">BOM</a>
+    <a href="#demo">Demo</a>
+    <a href="#refs">References</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ============================================================
+     1. EXECUTIVE SUMMARY
+     ============================================================ -->
+<div class="section" id="exec">
+  <div class="section-header">
+    <div class="section-icon">📋</div>
+    <div>
+      <div class="section-title">Executive Summary</div>
+      <div class="section-subtitle">ملخص تنفيذي للمشروع</div>
+    </div>
+    <span class="section-label tag-exec">EXEC-001</span>
+  </div>
+
+  <p style="font-size:.95em; color:var(--text-secondary); max-width:800px; line-height:1.9; margin-bottom:20px;">
+    <strong style="color:var(--text-primary);">DPRIMS</strong> هو نظام ذكي متكامل لفحص السكك الحديدية في الوقت الحقيقي يعمل بالطاقة الشمسية، ويستخدم تقنيات الذكاء الاصطناعي والرؤية الحاسوبية لاكتشاف عيوب السكة أثناء حركة القطار دون توقف. يجمع النظام بين كاميرتين <strong style="color:var(--text-primary);">ESP32-CAM</strong>، ونموذج <strong style="color:var(--text-primary);">YOLOv8</strong> للكشف الآني، وتحليل <strong style="color:var(--text-primary);">SSIM</strong> ثنائي الطور لمقارنة حالة السكة قبل وبعد مرور القطار، مع إرسال تنبيهات فورية للوحة تحكم React في حالة الخطر.
+  </p>
+
+  <div class="cards-grid">
+    <div class="card card-accent">
+      <span class="card-icon">🎯</span>
+      <h3>الهدف الرئيسي</h3>
+      <p>الكشف التلقائي عن عيوب السكك الحديدية في الوقت الفعلي بدقة تتجاوز 90% باستخدام الذكاء الاصطناعي.</p>
+    </div>
+    <div class="card card-accent">
+      <span class="card-icon">⚡</span>
+      <h3>الاستدامة</h3>
+      <p>نظام طاقة شمسية متكامل يجعل القطار مكتفياً ذاتياً طاقياً دون الحاجة لمصدر خارجي.</p>
+    </div>
+    <div class="card card-accent">
+      <span class="card-icon">📡</span>
+      <h3>الاتصال الفوري</h3>
+      <p>WebSocket + REST API يضمن إرسال التنبيهات خلال أجزاء من الثانية عند اكتشاف خطر.</p>
+    </div>
+    <div class="card card-accent">
+      <span class="card-icon">🛡️</span>
+      <h3>درجات الخطورة</h3>
+      <p>نظام ثلاثي المستويات: LOW / MEDIUM / HIGH مع قرار إيقاف تلقائي عند الخطر الشديد.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     2. PROBLEM STATEMENT
+     ============================================================ -->
+<div class="section" id="problem">
+  <div class="section-header">
+    <div class="section-icon">⚠️</div>
+    <div>
+      <div class="section-title">Problem Statement</div>
+      <div class="section-subtitle">المشكلة الحالية في فحص السكك الحديدية</div>
+    </div>
+    <span class="section-label tag-problem">PROB-001</span>
+  </div>
+
+  <div class="cards-grid-3">
+    <div class="card">
+      <span class="card-icon">👷</span>
+      <h3>الفحص اليدوي البطيء</h3>
+      <p>يعتمد الفحص التقليدي على عمال يمشون على القضبان، وهو إجراء بطيء وخطير ويُغطي مسافات محدودة يومياً.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">💰</span>
+      <h3>التكلفة العالية</h3>
+      <p>الأنظمة التجارية الحالية باهظة الثمن جداً ولا تُتيح للدول النامية الاستثمار في سلامة السكك الحديدية.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🚨</span>
+      <h3>تأخر الاستجابة</h3>
+      <p>الكشف المتأخر عن العيوب يؤدي إلى حوادث مأساوية وخسائر بشرية يمكن تفاديها بالرصد الفوري.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;">
+    <div style="background:#FEF2F2; border:1.5px solid #FECACA; border-radius:12px; overflow:hidden;">
+      <div style="background:#DC2626; padding:10px 20px;">
+        <span style="color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.9em;">⚠️ CURRENT STATE — مشاكل الفحص التقليدي</span>
+      </div>
+      <div style="padding:16px 20px; display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #FECACA; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">👷</span>
+          <div><span style="font-weight:700; color:#DC2626; font-size:.88em;">Manual Inspector</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> يمشي 5-10 كم يومياً فقط — تغطية محدودة جداً</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #FECACA; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">⏱️</span>
+          <div><span style="font-weight:700; color:#DC2626; font-size:.88em;">Detection Delay</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> أيام أو أسابيع قبل اكتشاف العيب — خطر مستمر</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #FECACA; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">😵</span>
+          <div><span style="font-weight:700; color:#DC2626; font-size:.88em;">Human Error</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> إرهاق، ضعف الرؤية، حكم شخصي غير موثوق</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #FECACA; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">💸</span>
+          <div><span style="font-weight:700; color:#DC2626; font-size:.88em;">High Cost</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> تكاليف عمالة عالية بدون تغطية 24/7</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#FEE2E2; border:1.5px solid #DC2626; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">🚨</span>
+          <div><span style="font-weight:700; color:#DC2626; font-size:.88em;">النتيجة</span><span style="color:#991B1B; font-size:.85em; font-weight:600; margin-right:8px;"> حوادث قطارات، خروج عن القضبان، خسائر بشرية</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     3. PROPOSED SOLUTION
+     ============================================================ -->
+<div class="section" id="solution">
+  <div class="section-header">
+    <div class="section-icon">✅</div>
+    <div>
+      <div class="section-title">Proposed Solution</div>
+      <div class="section-subtitle">كيف يحل DPRIMS هذه المشكلة؟</div>
+    </div>
+    <span class="section-label tag-solution">SOL-001</span>
+  </div>
+
+  <div style="margin-top:20px;">
+    <div style="background:#F0FDF4; border:1.5px solid #86EFAC; border-radius:12px; overflow:hidden;">
+      <div style="background:#16A34A; padding:10px 20px;">
+        <span style="color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.9em;">✅ DPRIMS — الحل المقترح الآلي</span>
+      </div>
+      <div style="padding:16px 20px; display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">📷</span>
+          <div><span style="font-weight:700; color:#15803D; font-size:.88em;">Dual ESP32-CAM</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> بث فيديو مستمر، كاميرا أمامية وخلفية</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">🧠</span>
+          <div><span style="font-weight:700; color:#15803D; font-size:.88em;">YOLOv8 Inference</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> كشف فوري للعيوب بأكثر من 15 إطار/ثانية</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">🔍</span>
+          <div><span style="font-weight:700; color:#15803D; font-size:.88em;">SSIM Analysis</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> مقارنة ثنائية الطور للكشف عن التغييرات</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">🛰️</span>
+          <div><span style="font-weight:700; color:#15803D; font-size:.88em;">GPS + Encoder</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> تحديد دقيق لموقع كل عيب مكتشف</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">☀️</span>
+          <div><span style="font-weight:700; color:#15803D; font-size:.88em;">Solar Power</span><span style="color:#6B7280; font-size:.85em; margin-right:8px;"> طاقة مستقلة تماماً بدون مصدر خارجي</span></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#DCFCE7; border:1.5px solid #16A34A; border-radius:8px; padding:12px 16px;">
+          <span style="font-size:1.4em; flex-shrink:0;">🎯</span>
+          <div><span style="font-weight:700; color:#15803D; font-size:.88em;">النتيجة</span><span style="color:#166534; font-size:.85em; font-weight:600; margin-right:8px;"> كشف مبكر، مراقبة 24/7، صفر مخاطر على الإنسان</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-grid mt-20">
+    <div class="card">
+      <span class="card-icon">🔄</span>
+      <h3>نهج ثنائي الطور</h3>
+      <p>كاميرا أمامية تلتقط السكة قبل المرور وكاميرا خلفية بعده — المقارنة تكشف أي تغير حدث بسبب القطار.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🧠</span>
+      <h3>ذكاء اصطناعي مدمج</h3>
+      <p>YOLOv8 يعمل محلياً على الـ Laptop دون الحاجة لاتصال إنترنت — Edge AI يعني استجابة فورية وخصوصية.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">☀️</span>
+      <h3>اكتفاء طاقي</h3>
+      <p>خلية شمسية + بطاريات 18650 تُغذي جميع المكونات الإلكترونية طوال رحلة الفحص.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">💲</span>
+      <h3>تكلفة منخفضة</h3>
+      <p>النظام بأكمله بتكلفة ~$87 مقارنة بعشرات الآلاف للأنظمة التجارية المعادلة.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     4. SYSTEM ARCHITECTURE
+     ============================================================ -->
+<div class="section" id="arch">
+  <div class="section-header">
+    <div class="section-icon">🏗️</div>
+    <div>
+      <div class="section-title">System Architecture</div>
+      <div class="section-subtitle">معمارية النظام الكاملة</div>
+    </div>
+    <span class="section-label">ARCH-001</span>
+  </div>
+
+  <!-- Full Architecture HTML Diagram -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:0; padding:10px 0;">
+
+    <!-- Title -->
+    <div style="background:linear-gradient(135deg,#1E293B,#0F172A); color:#fff; border-radius:12px 12px 0 0; padding:14px 32px; text-align:center; width:100%; max-width:700px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1em; color:#F8FAFC; letter-spacing:.05em;">DPRIMS — FULL SYSTEM ARCHITECTURE</div>
+    </div>
+
+    <!-- Layer 1: Physical -->
+    <div style="background:#FFFBEB; border:2px solid #FCD34D; width:100%; max-width:700px; padding:20px 24px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.8em; color:#D97706; text-transform:uppercase; letter-spacing:.1em; margin-bottom:14px;">⚙️ PHYSICAL LAYER — على القطار</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+        <div style="background:#fff; border:1px solid #FDE68A; border-radius:8px; padding:12px; text-align:center;">
+          <div style="font-size:1.5em; margin-bottom:6px;">☀️</div>
+          <div style="font-weight:700; font-size:.78em; color:#92400E;">Solar Panel</div>
+          <div style="font-size:.72em; color:#B45309;">12V / 5W</div>
+        </div>
+        <div style="background:#fff; border:1px solid #FDE68A; border-radius:8px; padding:12px; text-align:center;">
+          <div style="font-size:1.5em; margin-bottom:6px;">🔋</div>
+          <div style="font-weight:700; font-size:.78em; color:#92400E;">Battery Pack</div>
+          <div style="font-size:.72em; color:#B45309;">18650 × 6 + BMS</div>
+        </div>
+        <div style="background:#fff; border:1px solid #FDE68A; border-radius:8px; padding:12px; text-align:center;">
+          <div style="font-size:1.5em; margin-bottom:6px;">⚡</div>
+          <div style="font-weight:700; font-size:.78em; color:#92400E;">Buck Converter</div>
+          <div style="font-size:.72em; color:#B45309;">12V → 5V / 3A</div>
+        </div>
+        <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:12px; text-align:center;">
+          <div style="font-size:1.5em; margin-bottom:6px;">📷</div>
+          <div style="font-weight:700; font-size:.78em; color:#1D4ED8;">ESP32-CAM #1</div>
+          <div style="font-size:.72em; color:#3B82F6;">أمامية · 192.168.1.101</div>
+        </div>
+        <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:12px; text-align:center;">
+          <div style="font-size:1.5em; margin-bottom:6px;">📷</div>
+          <div style="font-weight:700; font-size:.78em; color:#1D4ED8;">ESP32-CAM #2</div>
+          <div style="font-size:.72em; color:#3B82F6;">خلفية · 192.168.1.102</div>
+        </div>
+        <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:12px; text-align:center;">
+          <div style="font-size:1.5em; margin-bottom:6px;">🎛️</div>
+          <div style="font-weight:700; font-size:.78em; color:#1D4ED8;">ESP32 DevKit</div>
+          <div style="font-size:.72em; color:#3B82F6;">GPS + Encoder + Motors</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display:flex; flex-direction:column; align-items:center; background:#F1F5F9; width:100%; max-width:700px; padding:8px; border-right:2px solid #E2E8F0; border-left:2px solid #E2E8F0;">
+      <div style="font-size:.72em; color:#64748B; font-family:'JetBrains Mono',monospace;">📡 WiFi 2.4GHz</div>
+      <div style="font-size:1.4em; color:#94A3B8;">↓</div>
+    </div>
+
+    <!-- Layer 2: Edge Processing -->
+    <div style="background:#FAF5FF; border:2px solid #C4B5FD; width:100%; max-width:700px; padding:20px 24px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.8em; color:#7C3AED; text-transform:uppercase; letter-spacing:.1em; margin-bottom:14px;">🖥️ EDGE PROCESSING LAYER — Laptop</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="background:#fff; border:1px solid #DDD6FE; border-radius:8px; padding:14px;">
+          <div style="font-weight:700; font-size:.82em; color:#7C3AED; margin-bottom:8px;">🐍 Python AI Pipeline</div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <div style="font-size:.78em; color:#475569; display:flex; gap:6px; align-items:center;"><span style="color:#7C3AED; font-weight:700;">OpenCV</span> Frame capture + preprocessing</div>
+            <div style="font-size:.78em; color:#475569; display:flex; gap:6px; align-items:center;"><span style="color:#7C3AED; font-weight:700;">YOLOv8</span> Real-time defect detection</div>
+            <div style="font-size:.78em; color:#475569; display:flex; gap:6px; align-items:center;"><span style="color:#7C3AED; font-weight:700;">SSIM</span> Dual-phase comparison</div>
+            <div style="font-size:.78em; color:#475569; display:flex; gap:6px; align-items:center;"><span style="color:#7C3AED; font-weight:700;">Alert</span> Severity classification</div>
+          </div>
+        </div>
+        <div style="background:#fff; border:1px solid #DDD6FE; border-radius:8px; padding:14px;">
+          <div style="font-weight:700; font-size:.82em; color:#059669; margin-bottom:8px;">🟢 Node.js Backend :3000</div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <div style="font-size:.78em; color:#475569; display:flex; gap:6px; align-items:center;"><span style="color:#059669; font-weight:700;">REST API</span> /alerts /reports /status</div>
+            <div style="font-size:.78em; color:#475569; display:flex; gap:6px; align-items:center;"><span style="color:#059669; font-weight:700;">WebSocket</span> Real-time broadcast</div>
+            <div style="font-size:.78em; color:#475569; display:flex; gap:6px; align-items:center;"><span style="color:#059669; font-weight:700;">MongoDB</span> Persistent storage</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display:flex; flex-direction:column; align-items:center; background:#F1F5F9; width:100%; max-width:700px; padding:8px; border-right:2px solid #E2E8F0; border-left:2px solid #E2E8F0;">
+      <div style="font-size:.72em; color:#64748B; font-family:'JetBrains Mono',monospace;">WebSocket + REST API</div>
+      <div style="font-size:1.4em; color:#94A3B8;">↓</div>
+    </div>
+
+    <!-- Layer 3: Dashboard -->
+    <div style="background:#F0FDF4; border:2px solid #86EFAC; border-radius:0 0 12px 12px; width:100%; max-width:700px; padding:20px 24px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.8em; color:#16A34A; text-transform:uppercase; letter-spacing:.1em; margin-bottom:14px;">🌐 DASHBOARD LAYER — Browser :5173</div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+        <div style="background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:10px; text-align:center; font-size:.78em;"><div style="font-size:1.3em; margin-bottom:4px;">🗺️</div><div style="font-weight:600; color:#15803D;">Railway Map</div></div>
+        <div style="background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:10px; text-align:center; font-size:.78em;"><div style="font-size:1.3em; margin-bottom:4px;">🚨</div><div style="font-weight:600; color:#15803D;">Alert Panel</div></div>
+        <div style="background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:10px; text-align:center; font-size:.78em;"><div style="font-size:1.3em; margin-bottom:4px;">📊</div><div style="font-weight:600; color:#15803D;">Analytics</div></div>
+        <div style="background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:10px; text-align:center; font-size:.78em;"><div style="font-size:1.3em; margin-bottom:4px;">🎥</div><div style="font-weight:600; color:#15803D;">Live Feed</div></div>
+        <div style="background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:10px; text-align:center; font-size:.78em;"><div style="font-size:1.3em; margin-bottom:4px;">🔧</div><div style="font-weight:600; color:#15803D;">Maintenance</div></div>
+        <div style="background:#fff; border:1px solid #BBF7D0; border-radius:8px; padding:10px; text-align:center; font-size:.78em;"><div style="font-size:1.3em; margin-bottom:4px;">📈</div><div style="font-weight:600; color:#15803D;">Reports</div></div>
+      </div>
+    </div>
+
+  </div>
+
+<!-- ============================================================
+     5. HARDWARE LAYER
+     ============================================================ -->
+<div class="section" id="hardware">
+  <div class="section-header">
+    <div class="section-icon">🔧</div>
+    <div>
+      <div class="section-title">Hardware Layer</div>
+      <div class="section-subtitle">الطبقة الإلكترونية والمكونات الفيزيائية</div>
+    </div>
+    <span class="section-label tag-hardware">HW-001</span>
+  </div>
+
+  <h3 class="sub-title">⚡ منظومة الطاقة الشمسية</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>المكون</th><th>المواصفات</th><th>الكمية</th><th>السعر</th><th>استهلاك الطاقة</th><th>سبب الاختيار</th><th>النوع</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>خلية شمسية</td><td>12V / 5W</td><td>1</td><td class="price">~$10</td>
+          <td>—</td>
+          <td>توفير طاقة مستدامة بدون شحن خارجي</td>
+          <td><span class="tag tag-power">طاقة</span></td>
+        </tr>
+        <tr>
+          <td>بطارية 18650</td><td>3.7V / 2500mAh</td><td>6</td><td class="price">~$12</td>
+          <td>—</td>
+          <td>تخزين الطاقة الشمسية · سعة كافية لرحلات طويلة</td>
+          <td><span class="tag tag-power">طاقة</span></td>
+        </tr>
+        <tr>
+          <td>BMS 3S 20A</td><td>12V Protection</td><td>1</td><td class="price">~$3</td>
+          <td>&lt;0.1W</td>
+          <td>حماية البطاريات من الشحن الزائد والتفريغ الكامل</td>
+          <td><span class="tag tag-power">طاقة</span></td>
+        </tr>
+        <tr>
+          <td>PWM Solar Controller</td><td>12V / 10A</td><td>1</td><td class="price">~$4</td>
+          <td>&lt;0.5W</td>
+          <td>تنظيم الشحن الشمسي وحماية البطاريات</td>
+          <td><span class="tag tag-power">طاقة</span></td>
+        </tr>
+        <tr>
+          <td>Buck Converter</td><td>12V → 5V / 3A</td><td>2</td><td class="price">~$4</td>
+          <td>0.3W idle</td>
+          <td>تحويل 12V إلى 5V لتغذية ESP32 والكاميرات</td>
+          <td><span class="tag tag-power">طاقة</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">🤖 الإلكترونيات الرئيسية</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>المكون</th><th>المواصفات</th><th>الكمية</th><th>السعر</th><th>استهلاك الطاقة</th><th>سبب الاختيار</th><th>النوع</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ESP32-CAM</td><td>OV2640 · 2MP</td><td>3 (1 احتياطي)</td><td class="price">~$15</td>
+          <td>250mA peak</td>
+          <td>رخيص · WiFi مدمج · كاميرا مدمجة · مجتمع ضخم</td>
+          <td><span class="tag tag-control">تحكم</span></td>
+        </tr>
+        <tr>
+          <td>ESP32 DevKit</td><td>30-pin · 240MHz</td><td>1</td><td class="price">~$5</td>
+          <td>160mA peak</td>
+          <td>يتحكم في الموتورات والـ GPS والـ WebSocket</td>
+          <td><span class="tag tag-control">تحكم</span></td>
+        </tr>
+        <tr>
+          <td>L298N Motor Driver</td><td>12V / 2A</td><td>1</td><td class="price">~$3</td>
+          <td>حسب الحمل</td>
+          <td>يدير موتورين مستقلين مع دعم PWM للسرعة</td>
+          <td><span class="tag tag-control">تحكم</span></td>
+        </tr>
+        <tr>
+          <td>DC Motor</td><td>12V / 300RPM</td><td>2</td><td class="price">~$6</td>
+          <td>500mA-1A</td>
+          <td>عزم مناسب لتحريك الماكيت على القضبان</td>
+          <td><span class="tag tag-control">تحكم</span></td>
+        </tr>
+        <tr>
+          <td>Neo-6M GPS</td><td>+Antenna · UART</td><td>1</td><td class="price">~$5</td>
+          <td>45mA</td>
+          <td>تحديد الموقع الجغرافي الدقيق لكل عيب مكتشف</td>
+          <td><span class="tag tag-sensor">حساس</span></td>
+        </tr>
+        <tr>
+          <td>Photo Encoder</td><td>LM393 / 5V</td><td>1</td><td class="price">35 جنيه</td>
+          <td>&lt;10mA</td>
+          <td>قياس المسافة بدقة ± 1cm بدون GPS داخل المبنى</td>
+          <td><span class="tag tag-sensor">حساس</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box">
+    💡 <strong>المجموع التقريبي الكلي للمشروع: ~$87</strong> — يُعدّ هذا تكلفة منخفضة جداً مقارنة بالأنظمة التجارية المعادلة التي تتجاوز قيمتها $50,000.
+  </div>
+
+  <h3 class="sub-title mt-20">🔮 تطويرات مستقبلية للطبقة الإلكترونية</h3>
+  <div class="pill-row">
+    <span class="pill pill-purple">🖥️ NVIDIA Jetson Nano (Edge AI)</span>
+    <span class="pill pill-blue">📡 LiDAR Sensor (3D mapping)</span>
+    <span class="pill pill-teal">📐 IMU Sensor (vibration & tilt)</span>
+    <span class="pill pill-blue">🌡️ Thermal Camera (heat anomalies)</span>
+    <span class="pill pill-purple">📳 Vibration Monitoring (MPU6050)</span>
+    <span class="pill pill-teal">🔊 Ultrasonic Distance Sensor</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     6. AI LAYER
+     ============================================================ -->
+<div class="section" id="ai">
+  <div class="section-header">
+    <div class="section-icon">🧠</div>
+    <div>
+      <div class="section-title">AI Layer</div>
+      <div class="section-subtitle">طبقة الذكاء الاصطناعي والرؤية الحاسوبية</div>
+    </div>
+    <span class="section-label tag-ai">AI-001</span>
+  </div>
+
+  <div class="cards-grid mb-20">
+    <div class="card">
+      <span class="card-icon">🎯</span>
+      <h3>YOLOv8-nano</h3>
+      <p>أسرع نسخ YOLO · يعمل على CPU عادي · يكتشف 5 فئات عيوب في أقل من 100ms.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔍</span>
+      <h3>SSIM Analysis</h3>
+      <p>مقارنة الصورة الأمامية مع الخلفية لنفس النقطة — Score أقل من 0.85 يعني تغيير حدث.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">📊</span>
+      <h3>OpenCV Pipeline</h3>
+      <p>Preprocessing · Frame sync · ROI cropping · تحسين التباين في الإضاءة المنخفضة.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔗</span>
+      <h3>نتائج مدمجة</h3>
+      <p>يُدمج النظام نتائج YOLO + SSIM لتقليل False Positives ورفع الدقة الكلية.</p>
+    </div>
+  </div>
+
+  <h3 class="sub-title">فئات العيوب المكتشفة</h3>
+
+  <!-- YOLO Defect Classes -->
+  <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; margin:14px 0;">
+    <div style="background:#7C3AED; padding:10px 20px;">
+      <span style="color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.88em;">🧠 YOLOv8 — فئات العيوب المكتشفة (5 Classes)</span>
+    </div>
+    <div style="padding:16px;">
+      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
+        <div style="display:grid; grid-template-columns:140px 1fr auto; gap:12px; align-items:center; background:#FEE2E2; border:1px solid #FECACA; border-radius:8px; padding:10px 14px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-weight:700; color:#DC2626; font-size:.85em;">crack</span>
+          <span style="font-size:.85em; color:#374151;">شرخ في القضيب</span>
+          <span style="background:#DC2626; color:#fff; font-size:.7em; font-weight:700; padding:3px 10px; border-radius:100px; white-space:nowrap;">HIGH · 0.93</span>
+        </div>
+        <div style="display:grid; grid-template-columns:140px 1fr auto; gap:12px; align-items:center; background:#FEE2E2; border:1px solid #FECACA; border-radius:8px; padding:10px 14px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-weight:700; color:#DC2626; font-size:.85em;">broken_rail</span>
+          <span style="font-size:.85em; color:#374151;">كسر كامل في القضيب</span>
+          <span style="background:#7F1D1D; color:#fff; font-size:.7em; font-weight:700; padding:3px 10px; border-radius:100px; white-space:nowrap;">CRITICAL · STOP</span>
+        </div>
+        <div style="display:grid; grid-template-columns:140px 1fr auto; gap:12px; align-items:center; background:#FEE2E2; border:1px solid #FECACA; border-radius:8px; padding:10px 14px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-weight:700; color:#DC2626; font-size:.85em;">rail_gap</span>
+          <span style="font-size:.85em; color:#374151;">فجوة غير طبيعية بين قطع السكة</span>
+          <span style="background:#DC2626; color:#fff; font-size:.7em; font-weight:700; padding:3px 10px; border-radius:100px; white-space:nowrap;">HIGH · خطر انقلاب</span>
+        </div>
+        <div style="display:grid; grid-template-columns:140px 1fr auto; gap:12px; align-items:center; background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:10px 14px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-weight:700; color:#D97706; font-size:.85em;">missing_bolt</span>
+          <span style="font-size:.85em; color:#374151;">مسمار ناقص</span>
+          <span style="background:#D97706; color:#fff; font-size:.7em; font-weight:700; padding:3px 10px; border-radius:100px; white-space:nowrap;">MEDIUM · جدوَل صيانة</span>
+        </div>
+        <div style="display:grid; grid-template-columns:140px 1fr auto; gap:12px; align-items:center; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:10px 14px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-weight:700; color:#16A34A; font-size:.85em;">sleeper_damage</span>
+          <span style="font-size:.85em; color:#374151;">فلنكة تالفة</span>
+          <span style="background:#16A34A; color:#fff; font-size:.7em; font-weight:700; padding:3px 10px; border-radius:100px; white-space:nowrap;">LOW · سجّل وأرسل</span>
+        </div>
+      </div>
+
+      <!-- SSIM Scale -->
+      <div style="background:#fff; border:1px solid #E2E8F0; border-radius:10px; padding:16px;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.82em; color:#475569; margin-bottom:12px;">🔍 SSIM Score — مقياس التشابه البنيوي</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div style="background:#F0FDF4; border:1.5px solid #86EFAC; border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-family:'JetBrains Mono',monospace; font-weight:800; color:#16A34A; font-size:1em;">≥ 0.85</div>
+            <div style="font-size:.75em; color:#15803D; font-weight:600; margin-top:4px;">لا تغيير</div>
+            <div style="background:#16A34A; color:#fff; font-size:.7em; font-weight:700; padding:2px 10px; border-radius:100px; margin-top:6px; display:inline-block;">✓ PASS</div>
+          </div>
+          <div style="background:#FFFBEB; border:1.5px solid #FCD34D; border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-family:'JetBrains Mono',monospace; font-weight:800; color:#D97706; font-size:1em;">0.70 – 0.84</div>
+            <div style="font-size:.75em; color:#B45309; font-weight:600; margin-top:4px;">تغيير طفيف</div>
+            <div style="background:#D97706; color:#fff; font-size:.7em; font-weight:700; padding:2px 10px; border-radius:100px; margin-top:6px; display:inline-block;">⚠ WARN</div>
+          </div>
+          <div style="background:#FEF2F2; border:1.5px solid #FECACA; border-radius:8px; padding:12px; text-align:center;">
+            <div style="font-family:'JetBrains Mono',monospace; font-weight:800; color:#DC2626; font-size:1em;">&lt; 0.70</div>
+            <div style="font-size:.75em; color:#991B1B; font-weight:600; margin-top:4px;">تغيير كبير</div>
+            <div style="background:#DC2626; color:#fff; font-size:.7em; font-weight:700; padding:2px 10px; border-radius:100px; margin-top:6px; display:inline-block;">🚨 ALERT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-title mt-24">🚀 تطويرات AI مقترحة</h3>
+  <div class="pills-row" style="display:flex;flex-wrap:wrap;gap:8px;">
+    <span class="pill pill-purple">YOLOv8 + Segmentation (pixel-level masks)</span>
+    <span class="pill pill-blue">Anomaly Detection (Isolation Forest)</span>
+    <span class="pill pill-teal">Rail Geometry Estimation (depth maps)</span>
+    <span class="pill pill-purple">Vibration Sensor + AI Fusion</span>
+    <span class="pill pill-blue">Predictive Maintenance ML Model</span>
+    <span class="pill pill-teal">Multimodal AI (vision + IMU + thermal)</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     7. SOFTWARE LAYER
+     ============================================================ -->
+<div class="section" id="software">
+  <div class="section-header">
+    <div class="section-icon">💻</div>
+    <div>
+      <div class="section-title">Software Layer</div>
+      <div class="section-subtitle">التفاصيل التقنية لكل مكون برمجي</div>
+    </div>
+    <span class="section-label tag-software">SW-001</span>
+  </div>
+
+  <div class="cards-grid-3 mb-20">
+    <div class="card">
+      <span class="card-icon">🐍</span>
+      <h3>Python AI Pipeline</h3>
+      <p><strong>OpenCV</strong> للـ Video Capture · <strong>Ultralytics YOLOv8</strong> للـ detection · <strong>skimage.SSIM</strong> للمقارنة · <strong>requests</strong> لإرسال النتائج للـ Backend.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🟢</span>
+      <h3>Node.js Backend</h3>
+      <p><strong>Express.js</strong> للـ REST API · <strong>Socket.io</strong> للـ WebSocket · <strong>Mongoose</strong> للـ MongoDB · <strong>JWT</strong> للمصادقة (مستقبلاً).</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">⚛️</span>
+      <h3>React Dashboard</h3>
+      <p><strong>Vite + React 18</strong> · <strong>Leaflet.js</strong> للخريطة · <strong>Chart.js</strong> للرسوم · <strong>Socket.io-client</strong> للتحديث الفوري.</p>
+    </div>
+  </div>
+
+  <h3 class="sub-title">🐍 Python AI Pipeline — الكود الأساسي</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+      <span class="code-file">analysis.py — DPRIMS AI Core</span>
+    </div>
+    <div class="code-block"><span class="cmt"># DPRIMS — AI Analysis Pipeline</span>
+<span class="kw">import</span> cv2, requests, time, base64
+<span class="kw">from</span> ultralytics <span class="kw">import</span> YOLO
+<span class="kw">from</span> skimage.metrics <span class="kw">import</span> structural_similarity <span class="kw">as</span> ssim
+
+<span class="cmt"># ─── Config ───────────────────────────────────────────────────</span>
+CAM_FRONT   = <span class="str">"http://192.168.1.101/stream"</span>
+CAM_REAR    = <span class="str">"http://192.168.1.102/stream"</span>
+BACKEND_URL = <span class="str">"http://192.168.1.100:3000/api/alert"</span>
+SSIM_THRESH = <span class="num">0.85</span>   <span class="cmt"># below this = structural change detected</span>
+
+<span class="cmt"># ─── Load Model ───────────────────────────────────────────────</span>
+model = YOLO(<span class="str">"rail_defects_v3.pt"</span>)
+
+<span class="kw">def</span> <span class="hi">analyze_frame_pair</span>(front_frame, rear_frame, train_data):
+    <span class="cmt"># 1. YOLOv8 inference on front frame</span>
+    results   = model.predict(front_frame, conf=<span class="num">0.6</span>, verbose=<span class="hi">False</span>)
+    detections = results[<span class="num">0</span>].boxes
+
+    <span class="cmt"># 2. SSIM dual-phase comparison</span>
+    gray_front = cv2.cvtColor(front_frame, cv2.COLOR_BGR2GRAY)
+    gray_rear  = cv2.cvtColor(rear_frame,  cv2.COLOR_BGR2GRAY)
+    score, _   = ssim(gray_front, gray_rear, full=<span class="hi">True</span>)
+
+    <span class="cmt"># 3. Severity classification</span>
+    severity = classify_severity(detections, score)
+
+    <span class="cmt"># 4. Send alert if anomaly found</span>
+    <span class="kw">if</span> severity != <span class="str">"NORMAL"</span>:
+        send_alert(detections, score, severity, train_data, front_frame, rear_frame)
+
+<span class="kw">def</span> <span class="hi">classify_severity</span>(detections, ssim_score):
+    critical_classes = {<span class="str">"crack"</span>, <span class="str">"broken_rail"</span>, <span class="str">"rail_gap"</span>}
+    medium_classes   = {<span class="str">"missing_bolt"</span>, <span class="str">"sleeper_damage"</span>}
+    
+    <span class="kw">for</span> box <span class="kw">in</span> detections:
+        label = model.names[<span class="kw">int</span>(box.cls)]
+        <span class="kw">if</span> label <span class="kw">in</span> critical_classes: <span class="kw">return</span> <span class="str">"HIGH"</span>
+        <span class="kw">if</span> label <span class="kw">in</span> medium_classes:   <span class="kw">return</span> <span class="str">"MEDIUM"</span>
+    
+    <span class="kw">if</span> ssim_score < SSIM_THRESH:    <span class="kw">return</span> <span class="str">"MEDIUM"</span>
+    <span class="kw">return</span> <span class="str">"NORMAL"</span></div>
+  </div>
+
+  <h3 class="sub-title mt-20">🟢 Node.js WebSocket Server</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+      <span class="code-file">server.js — Backend Core</span>
+    </div>
+    <div class="code-block"><span class="kw">const</span> express   = require(<span class="str">'express'</span>);
+<span class="kw">const</span> { Server } = require(<span class="str">'socket.io'</span>);
+<span class="kw">const</span> Alert      = require(<span class="str">'./models/Alert'</span>);
+
+<span class="cmt">// ─── Alert endpoint (receives from Python) ─────────────────</span>
+app.post(<span class="str">'/api/alert'</span>, <span class="kw">async</span> (req, res) => {
+    <span class="kw">const</span> alertData = req.body;
+    
+    <span class="cmt">// Save to MongoDB</span>
+    <span class="kw">await</span> Alert.create(alertData);
+    
+    <span class="cmt">// Broadcast to ALL connected dashboards via WebSocket</span>
+    io.emit(<span class="str">'new_alert'</span>, alertData);
+    
+    <span class="cmt">// If HIGH severity → emit emergency stop command</span>
+    <span class="kw">if</span> (alertData.defect.severity === <span class="str">'HIGH'</span>) {
+        io.emit(<span class="str">'emergency_stop'</span>, { train_id: alertData.train_id });
+    }
+    
+    res.json({ status: <span class="str">'received'</span>, id: alertData._id });
+});</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     8. DATA FLOW
+     ============================================================ -->
+<div class="section" id="dataflow">
+  <div class="section-header">
+    <div class="section-icon">🔄</div>
+    <div>
+      <div class="section-title">Data Flow</div>
+      <div class="section-subtitle">مسار البيانات من اللحظة صفر حتى التنبيه</div>
+    </div>
+    <span class="section-label">DF-001</span>
+  </div>
+
+  <div style="display:flex;gap:24px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:280px;">
+      <div class="flow-wrap">
+        <div class="flow-node primary">
+          <div class="flow-node-title">📷 ESP32-CAM #1 (أمامية)</div>
+          <div class="flow-node-sub">MJPEG Stream · 192.168.1.101</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">
+          <div class="flow-node-title">🐍 Python OpenCV</div>
+          <div class="flow-node-sub">Frame capture + preprocessing</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">
+          <div class="flow-node-title">🧠 YOLOv8 Inference</div>
+          <div class="flow-node-sub">Defect detection + bounding boxes</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">
+          <div class="flow-node-title">🔍 SSIM Comparison</div>
+          <div class="flow-node-sub">Front vs Rear · Score calculation</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">
+          <div class="flow-node-title">⚖️ Severity Classification</div>
+          <div class="flow-node-sub">LOW / MEDIUM / HIGH</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node primary">
+          <div class="flow-node-title">🚀 POST /api/alert</div>
+          <div class="flow-node-sub">Node.js Backend · JSON payload</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node">
+          <div class="flow-node-title">📡 WebSocket Broadcast</div>
+          <div class="flow-node-sub">io.emit('new_alert') → Dashboard</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node primary">
+          <div class="flow-node-title">🖥️ React Dashboard</div>
+          <div class="flow-node-sub">Alert displayed in &lt; 1 second</div>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:280px;">
+      <h3 class="sub-title">📦 Alert JSON Payload</h3>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+          <span class="code-file">alert_payload.json</span>
+        </div>
+        <div class="code-block">{
+  <span class="str">"train_id"</span>:          <span class="str">"Train_01"</span>,
+  <span class="str">"timestamp"</span>:         <span class="str">"2026-03-12T10:30:00Z"</span>,
+  <span class="str">"gps"</span>: {
+    <span class="str">"lat"</span>: <span class="num">30.0444</span>,  <span class="cmt">// Cairo</span>
+    <span class="str">"lng"</span>: <span class="num">31.2357</span>
+  },
+  <span class="str">"track_position_cm"</span>: <span class="num">14550</span>, <span class="cmt">// Encoder data</span>
+  <span class="str">"defect"</span>: {
+    <span class="str">"type"</span>:        <span class="str">"crack"</span>,
+    <span class="str">"confidence"</span>:  <span class="num">0.93</span>,
+    <span class="str">"severity"</span>:    <span class="str">"HIGH"</span>,
+    <span class="str">"bbox"</span>:        [<span class="num">120</span>, <span class="num">80</span>, <span class="num">340</span>, <span class="num">200</span>]
+  },
+  <span class="str">"ssim_score"</span>:      <span class="num">0.61</span>, <span class="cmt">// &lt; 0.85 → change detected</span>
+  <span class="str">"images"</span>: {
+    <span class="str">"front"</span>: <span class="str">"base64..."</span>,
+    <span class="str">"rear"</span>:  <span class="str">"base64..."</span>
+  },
+  <span class="str">"action"</span>: <span class="str">"STOP_ALL_TRAINS"</span>
+}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     9. SAFETY SYSTEM
+     ============================================================ -->
+<div class="section" id="safety">
+  <div class="section-header">
+    <div class="section-icon">🛡️</div>
+    <div>
+      <div class="section-title">Safety System</div>
+      <div class="section-subtitle">نظام التنبيهات وقرارات السلامة التلقائية</div>
+    </div>
+    <span class="section-label tag-problem">SAFE-001</span>
+  </div>
+
+  <div class="sev-grid mb-20">
+    <div class="sev-card sev-low">
+      <div class="sev-label">✅ LOW</div>
+      <div class="sev-items">
+        مسمار ناقص<br>
+        فلنكة تالفة<br>
+        ميلان بسيط &lt; 3°
+      </div>
+      <div class="sev-action">سجّل + أرسل تقرير دوري</div>
+    </div>
+    <div class="sev-card sev-medium">
+      <div class="sev-label">⚠️ MEDIUM</div>
+      <div class="sev-items">
+        شرخ صغير<br>
+        ميلان &gt; 5°<br>
+        تباعد غير طبيعي
+      </div>
+      <div class="sev-action">أبطئ القطار + جدوَل صيانة</div>
+    </div>
+    <div class="sev-card sev-high">
+      <div class="sev-label">🚨 HIGH</div>
+      <div class="sev-items">
+        كسر كامل<br>
+        شرخ كبير واسع<br>
+        انفصال القضيب
+      </div>
+      <div class="sev-action">أوقف كل القطارات فوراً!</div>
+    </div>
+  </div>
+
+  <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; margin-top:20px;">
+    <div style="background:#0F172A; padding:10px 20px;">
+      <span style="color:#F8FAFC; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.88em;">🛡️ SAFETY DECISION TREE — كيف يتخذ النظام القرار</span>
+    </div>
+    <div style="padding:20px; display:flex; flex-direction:column; gap:12px;">
+
+      <!-- Input -->
+      <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; border-radius:10px; padding:14px 18px; text-align:center;">
+        <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; color:#1D4ED8; font-size:.9em;">المدخل: YOLO Detection + SSIM Score</span>
+      </div>
+
+      <!-- Arrow -->
+      <div style="text-align:center; color:#94A3B8; font-size:1.3em;">↓</div>
+
+      <!-- 3 outcomes -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+
+        <div style="background:#F0FDF4; border:1.5px solid #86EFAC; border-radius:10px; padding:16px;">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:#15803D; font-size:.82em; margin-bottom:10px;">✅ PASS</div>
+          <div style="font-size:.78em; color:#374151; margin-bottom:2px; font-weight:600;">الشرط:</div>
+          <div style="font-size:.78em; color:#6B7280; margin-bottom:10px; font-family:'JetBrains Mono',monospace;">لا عيوب + SSIM ≥ 0.85</div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <div style="background:#DCFCE7; border-radius:5px; padding:5px 8px; font-size:.75em; color:#15803D; font-weight:600;">استمر العملية بشكل طبيعي</div>
+          </div>
+        </div>
+
+        <div style="background:#FFFBEB; border:1.5px solid #FCD34D; border-radius:10px; padding:16px;">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:#D97706; font-size:.82em; margin-bottom:10px;">⚠️ LOW / MEDIUM</div>
+          <div style="font-size:.78em; color:#374151; margin-bottom:2px; font-weight:600;">الشرط:</div>
+          <div style="font-size:.78em; color:#6B7280; margin-bottom:10px; font-family:'JetBrains Mono',monospace;">عيب بسيط أو 0.70 ≤ SSIM &lt; 0.85</div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <div style="background:#FEF3C7; border-radius:5px; padding:5px 8px; font-size:.75em; color:#B45309; font-weight:600;">سجّل في MongoDB</div>
+            <div style="background:#FEF3C7; border-radius:5px; padding:5px 8px; font-size:.75em; color:#B45309; font-weight:600;">أرسل تنبيه للداشبورد</div>
+            <div style="background:#FEF3C7; border-radius:5px; padding:5px 8px; font-size:.75em; color:#B45309; font-weight:600;">جدوَل مهمة صيانة</div>
+          </div>
+        </div>
+
+        <div style="background:#FEF2F2; border:1.5px solid #FECACA; border-radius:10px; padding:16px;">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:#DC2626; font-size:.82em; margin-bottom:10px;">🚨 HIGH / CRITICAL</div>
+          <div style="font-size:.78em; color:#374151; margin-bottom:2px; font-weight:600;">الشرط:</div>
+          <div style="font-size:.78em; color:#6B7280; margin-bottom:10px; font-family:'JetBrains Mono',monospace;">عيب حرج أو SSIM &lt; 0.70</div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <div style="background:#FEE2E2; border-radius:5px; padding:5px 8px; font-size:.75em; color:#DC2626; font-weight:700;">أوقف جميع القطارات فوراً</div>
+            <div style="background:#FEE2E2; border-radius:5px; padding:5px 8px; font-size:.75em; color:#DC2626; font-weight:600;">أرسل SMS/Email لمركز العمليات</div>
+            <div style="background:#FEE2E2; border-radius:5px; padding:5px 8px; font-size:.75em; color:#DC2626; font-weight:600;">احفظ الأدلة (صور + GPS)</div>
+            <div style="background:#FEE2E2; border-radius:5px; padding:5px 8px; font-size:.75em; color:#DC2626; font-weight:600;">اقفل قطاع السكة لحين الفحص</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     10. DASHBOARD
+     ============================================================ -->
+<div class="section" id="dashboard">
+  <div class="section-header">
+    <div class="section-icon">📊</div>
+    <div>
+      <div class="section-title">Control Dashboard</div>
+      <div class="section-subtitle">لوحة التحكم والمراقبة الفورية</div>
+    </div>
+    <span class="section-label tag-software">DASH-001</span>
+  </div>
+
+  <div class="cards-grid-3 mb-20">
+    <div class="card">
+      <span class="card-icon">🗺️</span>
+      <h3>خريطة المسار الفورية</h3>
+      <p>Leaflet.js مع تحديث موقع القطار كل ثانية. تظهر علامات ملونة عند كل عيب مُكتشف بحسب درجة خطورته.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🚨</span>
+      <h3>لوحة التنبيهات</h3>
+      <p>كل تنبيه يعرض: نوع العيب · صورة مصغرة · موقع GPS · درجة الخطورة · الوقت · confidence score.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">📈</span>
+      <h3>رسوم بيانية تحليلية</h3>
+      <p>Chart.js يعرض: عدد العيوب اليومي · توزيع أنواع العيوب · سرعة القطار عبر الزمن · SSIM trend.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🎥</span>
+      <h3>بث الكاميرات المباشر</h3>
+      <p>عرض مباشر لكلا الكاميرتين الأمامية والخلفية مع Overlay للـ bounding boxes المكتشفة.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔧</span>
+      <h3>جدول الصيانة</h3>
+      <p>يُنشئ النظام تلقائياً جدول مهام الصيانة مُرتباً حسب الأولوية والموقع الجغرافي.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">📱</span>
+      <h3>متوافق مع الهاتف</h3>
+      <p>الداشبورد Responsive بالكامل — يعمل على الجوال والتابلت للمشغّلين الميدانيين.</p>
+    </div>
+  </div>
+
+  <h3 class="sub-title">🔮 تطويرات Dashboard المقترحة</h3>
+  <div class="pill-row">
+    <span class="pill pill-blue">🗺️ Defect Heatmap Layer</span>
+    <span class="pill pill-teal">🚄 Multi-train Monitoring</span>
+    <span class="pill pill-purple">🤖 AI Maintenance Scheduler</span>
+    <span class="pill pill-blue">📊 Railway Digital Twin</span>
+    <span class="pill pill-teal">⏱️ Incident Timeline View</span>
+    <span class="pill pill-purple">📡 Cloud Sync (Firebase)</span>
+    <span class="pill pill-blue">🔔 Push Notifications (PWA)</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     11. PROJECT IMPACT
+     ============================================================ -->
+<div class="section" id="impact">
+  <div class="section-header">
+    <div class="section-icon">💥</div>
+    <div>
+      <div class="section-title">Project Impact</div>
+      <div class="section-subtitle">الأثر المتوقع على قطاع السكك الحديدية</div>
+    </div>
+    <span class="section-label tag-impact">IMP-001</span>
+  </div>
+
+  <div class="impact-grid mb-20">
+    <div class="impact-card ic-blue">
+      <div class="impact-num">60%</div>
+      <div class="impact-desc">تخفيض وقت الاستجابة لأعطال السكة</div>
+    </div>
+    <div class="impact-card ic-red">
+      <div class="impact-num">80%</div>
+      <div class="impact-desc">تقليل احتمالية الحوادث الناتجة عن تلف الخضبان</div>
+    </div>
+    <div class="impact-card ic-green">
+      <div class="impact-num">90%</div>
+      <div class="impact-desc">توفير في تكلفة الفحص مقارنة بالأنظمة التجارية</div>
+    </div>
+    <div class="impact-card ic-teal">
+      <div class="impact-num">24/7</div>
+      <div class="impact-desc">فحص مستمر دون انقطاع بطاقة شمسية</div>
+    </div>
+  </div>
+
+  <div class="cards-grid-3">
+    <div class="card">
+      <span class="card-icon">🛡️</span>
+      <h3>تحسين أمان الركاب</h3>
+      <p>الكشف المبكر عن كسور وشقوق السكة يمنع الحوادث قبل وقوعها، مما يحمي آلاف الركاب يومياً.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">💰</span>
+      <h3>توفير تكاليف الصيانة</h3>
+      <p>الصيانة الوقائية بناءً على بيانات حقيقية أرخص بكثير من الصيانة الطارئة بعد وقوع الحادثة.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🌱</span>
+      <h3>الاستدامة البيئية</h3>
+      <p>الطاقة الشمسية تُلغي الحاجة للبطاريات القابلة للشحن المتكررة أو الوقود الإضافي للتشغيل.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     12. TECHNICAL INNOVATION
+     ============================================================ -->
+<div class="section" id="innovation">
+  <div class="section-header">
+    <div class="section-icon">🚀</div>
+    <div>
+      <div class="section-title">Technical Innovation</div>
+      <div class="section-subtitle">لماذا DPRIMS مختلف ومبتكر؟</div>
+    </div>
+    <span class="section-label tag-future">INNO-001</span>
+  </div>
+
+  <div class="cards-grid mb-20">
+    <div class="card">
+      <span class="card-icon">🔄</span>
+      <h3>ثنائية الطور (Dual-Phase)</h3>
+      <p>الجمع بين YOLO و SSIM في نظام واحد هو الابتكار الجوهري. التحقق الثنائي يُقلل الإنذارات الكاذبة بشكل كبير.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">☀️</span>
+      <h3>استقلالية الطاقة</h3>
+      <p>النظام الشمسي المدمج يجعل القطار مكتفياً ذاتياً — يمكن نشره في مناطق نائية بدون بنية تحتية.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">💲</span>
+      <h3>Democratizing AI Safety</h3>
+      <p>بتكلفة ~$87 مقابل $50,000+ للأنظمة التجارية، DPRIMS يُتيح سلامة السكك الحديدية للجميع.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">⚡</span>
+      <h3>Edge AI First</h3>
+      <p>المعالجة تحدث محلياً على الـ Laptop — لا حاجة لاتصال إنترنت أثناء الفحص، استجابة فورية.</p>
+    </div>
+  </div>
+
+  <div class="info-box">
+    🏆 <strong>الميزة التنافسية:</strong> DPRIMS يجمع AI + Hardware + Solar + Real-time Dashboard في نظام واحد متكامل بتكلفة زهيدة — هذا التكامل الشامل هو ما يجعله مشروعاً مميزاً وقابلاً للتطبيق الفعلي.
+  </div>
+</div>
+
+<!-- ============================================================
+     13. FUTURE WORK
+     ============================================================ -->
+<div class="section" id="future">
+  <div class="section-header">
+    <div class="section-icon">🔭</div>
+    <div>
+      <div class="section-title">Future Work & Scalability</div>
+      <div class="section-subtitle">التطويرات المستقبلية وقابلية التوسع</div>
+    </div>
+    <span class="section-label tag-future">FUT-001</span>
+  </div>
+
+  <div class="cards-grid-3 mb-20">
+    <div class="card">
+      <span class="card-icon">🌐</span>
+      <h3>Cloud AI Dashboard</h3>
+      <p>نقل المعالجة إلى السحابة (AWS / Firebase) مع Predictive Maintenance Model يتعلم من ملايين الصور.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">📱</span>
+      <h3>Railway Digital Twin</h3>
+      <p>نموذج رقمي ثلاثي الأبعاد للمسار الكامل يُحدَّث تلقائياً بناءً على بيانات الفحص الفورية.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🚁</span>
+      <h3>Drone Integration</h3>
+      <p>دمج طائرات مسيّرة مزودة بكاميرات تفحص المقاطع الصعبة وترسل البيانات لنفس النظام.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">📡</span>
+      <h3>5G Communication</h3>
+      <p>الانتقال من WiFi المحلي إلى 5G لتغطية رحلات بالكيلومترات الطويلة خارج نطاق الـ WiFi.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🚄</span>
+      <h3>Multi-train Network</h3>
+      <p>شبكة من القطارات تشارك بيانات الفحص مع بعضها لبناء خريطة صحة شاملة للمسار كله.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🤖</span>
+      <h3>Auto-maintenance Robot</h3>
+      <p>روبوت صيانة تلقائي يُرسَل للموقع بناءً على إحداثيات GPS الدقيقة من نظام DPRIMS.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:20px; display:flex; flex-direction:column; gap:0;">
+
+    <div style="display:grid; grid-template-columns:auto 1fr; gap:0; align-items:stretch;">
+
+      <!-- Phase 1 -->
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <div style="width:40px; height:40px; background:#2563EB; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:.85em; flex-shrink:0; z-index:1;">1</div>
+        <div style="width:2px; background:#E2E8F0; flex:1; min-height:16px;"></div>
+      </div>
+      <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; border-radius:10px; margin:0 0 12px 12px; padding:14px 18px;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; color:#1D4ED8; font-size:.85em; margin-bottom:6px;">Phase 1 — مشروع التخرج الحالي</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <span style="background:#DBEAFE; color:#1D4ED8; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">ESP32</span>
+          <span style="background:#DBEAFE; color:#1D4ED8; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">YOLOv8</span>
+          <span style="background:#DBEAFE; color:#1D4ED8; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Solar Power</span>
+          <span style="background:#DBEAFE; color:#1D4ED8; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">React Dashboard</span>
+          <span style="background:#DBEAFE; color:#1D4ED8; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Local WiFi</span>
+          <span style="background:#DBEAFE; color:#1D4ED8; font-size:.72em; font-weight:700; padding:3px 9px; border-radius:100px;">~$87</span>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <div style="width:40px; height:40px; background:#7C3AED; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:.85em; flex-shrink:0; z-index:1;">2</div>
+        <div style="width:2px; background:#E2E8F0; flex:1; min-height:16px;"></div>
+      </div>
+      <div style="background:#FAF5FF; border:1.5px solid #DDD6FE; border-radius:10px; margin:0 0 12px 12px; padding:14px 18px;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; color:#7C3AED; font-size:.85em; margin-bottom:6px;">Phase 2 — Edge AI محسّن (6-12 شهر)</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <span style="background:#EDE9FE; color:#7C3AED; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">NVIDIA Jetson</span>
+          <span style="background:#EDE9FE; color:#7C3AED; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">LiDAR</span>
+          <span style="background:#EDE9FE; color:#7C3AED; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">IMU Sensor</span>
+          <span style="background:#EDE9FE; color:#7C3AED; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Vibration Monitor</span>
+          <span style="background:#EDE9FE; color:#7C3AED; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">4G / LTE</span>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <div style="width:40px; height:40px; background:#0EA5E9; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:.85em; flex-shrink:0; z-index:1;">3</div>
+        <div style="width:2px; background:#E2E8F0; flex:1; min-height:16px;"></div>
+      </div>
+      <div style="background:#F0F9FF; border:1.5px solid #BAE6FD; border-radius:10px; margin:0 0 12px 12px; padding:14px 18px;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; color:#0369A1; font-size:.85em; margin-bottom:6px;">Phase 3 — Cloud Connected (1-2 سنة)</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <span style="background:#E0F2FE; color:#0369A1; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Firebase Cloud</span>
+          <span style="background:#E0F2FE; color:#0369A1; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Digital Twin</span>
+          <span style="background:#E0F2FE; color:#0369A1; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Predictive ML</span>
+          <span style="background:#E0F2FE; color:#0369A1; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Multi-train Network</span>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <div style="width:40px; height:40px; background:#16A34A; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:.85em; flex-shrink:0; z-index:1;">4</div>
+        <div style="width:2px; background:transparent; flex:1;"></div>
+      </div>
+      <div style="background:#F0FDF4; border:1.5px solid #86EFAC; border-radius:10px; margin:0 0 0 12px; padding:14px 18px;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; color:#15803D; font-size:.85em; margin-bottom:6px;">Phase 4 — استقلالية كاملة (2-3 سنة)</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <span style="background:#DCFCE7; color:#15803D; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">5G Network</span>
+          <span style="background:#DCFCE7; color:#15803D; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Drone Fleet</span>
+          <span style="background:#DCFCE7; color:#15803D; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">Auto-repair Robot</span>
+          <span style="background:#DCFCE7; color:#15803D; font-size:.72em; font-weight:600; padding:3px 9px; border-radius:100px;">National Rail Network</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     14. RISK ANALYSIS
+     ============================================================ -->
+<div class="section" id="risk">
+  <div class="section-header">
+    <div class="section-icon">⚠️</div>
+    <div>
+      <div class="section-title">Risk Analysis</div>
+      <div class="section-subtitle">تحليل المخاطر المحتملة وخطط التخفيف</div>
+    </div>
+    <span class="section-label tag-risk">RISK-001</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>الخطر</th><th>الاحتمالية</th><th>التأثير</th><th>المستوى</th><th>خطة التخفيف</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>انقطاع WiFi أثناء الرحلة</td>
+          <td>عالية</td><td>متوسط</td>
+          <td><span class="risk-badge risk-medium">MEDIUM</span></td>
+          <td>Buffer المعالجة محلياً + إعادة الإرسال عند الاتصال</td>
+        </tr>
+        <tr>
+          <td>إضاءة منخفضة تؤثر على الكاميرا</td>
+          <td>متوسطة</td><td>عالي</td>
+          <td><span class="risk-badge risk-high">HIGH</span></td>
+          <td>LED Strip إضاءة اصطناعية + تحسين Contrast في OpenCV</td>
+        </tr>
+        <tr>
+          <td>دقة YOLOv8 منخفضة (False Positives)</td>
+          <td>متوسطة</td><td>متوسط</td>
+          <td><span class="risk-badge risk-medium">MEDIUM</span></td>
+          <td>تعزيز Dataset + SSIM للتأكيد المزدوج + رفع Confidence Threshold</td>
+        </tr>
+        <tr>
+          <td>نفاد طاقة البطاريات</td>
+          <td>منخفضة</td><td>عالي</td>
+          <td><span class="risk-badge risk-medium">MEDIUM</span></td>
+          <td>مراقبة BMS + تنبيه عند 20% + وضع توفير الطاقة التلقائي</td>
+        </tr>
+        <tr>
+          <td>تعطل ESP32-CAM أثناء الرحلة</td>
+          <td>منخفضة</td><td>عالي</td>
+          <td><span class="risk-badge risk-medium">MEDIUM</span></td>
+          <td>3 وحدات (1 احتياطية) + مراقبة heartbeat كل 5 ثوانٍ</td>
+        </tr>
+        <tr>
+          <td>تأخر Dataset / صعوبة التدريب</td>
+          <td>متوسطة</td><td>عالي</td>
+          <td><span class="risk-badge risk-high">HIGH</span></td>
+          <td>Roboflow Public Datasets + Data Augmentation + Transfer Learning</td>
+        </tr>
+        <tr>
+          <td>اهتزاز القطار يُشوّش الصور</td>
+          <td>عالية</td><td>متوسط</td>
+          <td><span class="risk-badge risk-medium">MEDIUM</span></td>
+          <td>Video Stabilization في OpenCV + تثبيت ميكانيكي للكاميرا</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================
+     15. TESTING PLAN
+     ============================================================ -->
+<div class="section" id="testing">
+  <div class="section-header">
+    <div class="section-icon">🧪</div>
+    <div>
+      <div class="section-title">Testing Plan</div>
+      <div class="section-subtitle">خطة الاختبار الشامل لكل طبقات النظام</div>
+    </div>
+    <span class="section-label">TEST-001</span>
+  </div>
+
+  <div class="cards-grid-3">
+    <div class="card">
+      <span class="card-icon">🎯</span>
+      <h3>Unit Testing — AI Model</h3>
+      <p>قياس <strong>mAP@50</strong> و <strong>F1-Score</strong> على مجموعة Test لم يرها الموديل. الهدف: mAP &gt; 85%.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔗</span>
+      <h3>Integration Testing</h3>
+      <p>اختبار الاتصال الكامل: ESP32-CAM → Python → Node.js → Dashboard. قياس الـ Latency end-to-end.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🏃</span>
+      <h3>Stress Testing</h3>
+      <p>تشغيل النظام لمدة 2+ ساعة متواصلة — مراقبة استهلاك الطاقة، الذاكرة، وإخراج الـ CPU.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🛤️</span>
+      <h3>Track Simulation Test</h3>
+      <p>تشغيل القطار على ماكيت بعيوب مصطنعة معروفة — التحقق من اكتشاف 100% من العيوب الحرجة.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">⚡</span>
+      <h3>Power System Test</h3>
+      <p>اختبار منظومة الطاقة الشمسية في ضوء طبيعي ومحاكاة ظروف الغيوم — قياس وقت الاستمرارية.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">👥</span>
+      <h3>User Acceptance Test</h3>
+      <p>عرض الداشبورد على أعضاء الفريق وقياس سهولة الاستخدام وفهم التنبيهات في 30 ثانية أو أقل.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     16. TIMELINE — 10 DAYS
+     ============================================================ -->
+<div class="section" id="timeline">
+  <div class="section-header">
+    <div class="section-icon">📅</div>
+    <div>
+      <div class="section-title">Project Timeline</div>
+      <div class="section-subtitle">الجدول الزمني المفصّل — 10 أيام</div>
+    </div>
+    <span class="section-label">TL-001</span>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-day">Day 01</div>
+      <div class="tl-title">🚀 Project Setup</div>
+      <div class="tl-desc">إعداد البيئة البرمجية · تثبيت المكتبات · إنشاء GitHub repo · توزيع المهام</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 02</div>
+      <div class="tl-title">🗄️ Dataset Collection</div>
+      <div class="tl-desc">تحميل Dataset من Roboflow · Labeling العيوب · Data Augmentation · تقسيم Train/Val/Test</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 03</div>
+      <div class="tl-title">🧠 YOLO Training</div>
+      <div class="tl-desc">تدريب YOLOv8-nano · قياس mAP و F1 · تحسين Hyperparameters · export الموديل</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 04</div>
+      <div class="tl-title">🔧 Hardware Assembly</div>
+      <div class="tl-desc">بناء الماكيت الخشبي · توصيل الإلكترونيات · منظومة الطاقة الشمسية · اختبار المحركات</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 05</div>
+      <div class="tl-title">📡 ESP32 Comms</div>
+      <div class="tl-desc">برمجة ESP32-CAM للـ MJPEG Stream · ESP32 DevKit للـ WebSocket + GPS + Encoder</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 06</div>
+      <div class="tl-title">🐍 Python AI Pipeline</div>
+      <div class="tl-desc">دمج OpenCV + YOLOv8 + SSIM · اختبار على الكاميرات الحقيقية · ضبط الـ Thresholds</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 07</div>
+      <div class="tl-title">🟢 Backend API</div>
+      <div class="tl-desc">Node.js + Express REST API · MongoDB Schema · Socket.io WebSocket · اختبار Endpoints</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 08</div>
+      <div class="tl-title">⚛️ React Dashboard</div>
+      <div class="tl-desc">بناء UI · خريطة Leaflet · Charts · Alert Panel · WebSocket real-time connection</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 09</div>
+      <div class="tl-title">🔗 System Integration</div>
+      <div class="tl-desc">ربط كل المكونات · اختبار End-to-End كامل · إصلاح الأخطاء · قياس الـ Latency</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-day">Day 10</div>
+      <div class="tl-title">🎬 Testing + Demo</div>
+      <div class="tl-desc">اختبار شامل · تصوير Demo Video · إعداد Presentation · توثيق المشروع</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     17. TEAM
+     ============================================================ -->
+<div class="section" id="team">
+  <div class="section-header">
+    <div class="section-icon">👥</div>
+    <div>
+      <div class="section-title">Team Structure</div>
+      <div class="section-subtitle">توزيع فريق العمل — 10 أفراد</div>
+    </div>
+    <span class="section-label tag-team-sec">TEAM-001</span>
+  </div>
+
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-icon">🤖</div>
+      <div class="team-role">AI & Computer Vision</div>
+      <div class="team-count">3 أفراد</div>
+      <div class="team-tasks">
+        تجميع Dataset<br>
+        تدريب YOLOv8<br>
+        OpenCV Pipeline<br>
+        SSIM Integration<br>
+        Model Optimization
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-icon">🔧</div>
+      <div class="team-role">Hardware Engineering</div>
+      <div class="team-count">2 فرد</div>
+      <div class="team-tasks">
+        بناء الماكيت<br>
+        توصيل ESP32<br>
+        منظومة الطاقة<br>
+        اختبار المحركات<br>
+        GPS + Encoder
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-icon">🟢</div>
+      <div class="team-role">Backend Development</div>
+      <div class="team-count">2 فرد</div>
+      <div class="team-tasks">
+        Node.js API<br>
+        MongoDB Schema<br>
+        WebSocket Server<br>
+        Authentication<br>
+        API Documentation
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-icon">⚛️</div>
+      <div class="team-role">Frontend Dashboard</div>
+      <div class="team-count">2 فرد</div>
+      <div class="team-tasks">
+        React Dashboard<br>
+        Leaflet Map<br>
+        Chart.js Analytics<br>
+        Alert UI Design<br>
+        Responsive Layout
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-icon">📄</div>
+      <div class="team-role">Documentation</div>
+      <div class="team-count">1 فرد</div>
+      <div class="team-tasks">
+        الورقة البحثية<br>
+        Presentation<br>
+        Demo Video<br>
+        User Manual<br>
+        GitHub Wiki
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     18. BILL OF MATERIALS
+     ============================================================ -->
+<div class="section" id="shopping">
+  <div class="section-header">
+    <div class="section-icon">🛒</div>
+    <div>
+      <div class="section-title">Bill of Materials</div>
+      <div class="section-subtitle">قائمة المشتريات الكاملة مع التكاليف</div>
+    </div>
+    <span class="section-label">BOM-001</span>
+  </div>
+
+  <h3 class="sub-title">⚡ منظومة الطاقة</h3>
+  <div class="table-wrap mb-20">
+    <table>
+      <thead><tr><th>القطعة</th><th>المواصفات</th><th>الكمية</th><th>السعر</th><th>النوع</th></tr></thead>
+      <tbody>
+        <tr><td>خلية شمسية</td><td>12V / 5W</td><td>1</td><td class="price">~$10</td><td><span class="tag tag-power">طاقة</span></td></tr>
+        <tr><td>بطارية 18650</td><td>3.7V / 2500mAh</td><td>6</td><td class="price">~$12</td><td><span class="tag tag-power">طاقة</span></td></tr>
+        <tr><td>BMS 3S 20A</td><td>12V Protection</td><td>1</td><td class="price">~$3</td><td><span class="tag tag-power">طاقة</span></td></tr>
+        <tr><td>PWM Solar Controller</td><td>12V / 10A</td><td>1</td><td class="price">~$4</td><td><span class="tag tag-power">طاقة</span></td></tr>
+        <tr><td>Buck Converter</td><td>12V → 5V / 3A</td><td>2</td><td class="price">~$4</td><td><span class="tag tag-power">طاقة</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">🤖 الإلكترونيات الرئيسية</h3>
+  <div class="table-wrap mb-20">
+    <table>
+      <thead><tr><th>القطعة</th><th>المواصفات</th><th>الكمية</th><th>السعر</th><th>النوع</th></tr></thead>
+      <tbody>
+        <tr><td>ESP32-CAM</td><td>مع OV2640</td><td>3 (1 احتياطي)</td><td class="price">~$15</td><td><span class="tag tag-control">تحكم</span></td></tr>
+        <tr><td>ESP32 DevKit</td><td>30-pin</td><td>1</td><td class="price">~$5</td><td><span class="tag tag-control">تحكم</span></td></tr>
+        <tr><td>L298N Motor Driver</td><td>12V / 2A Module</td><td>1</td><td class="price">~$3</td><td><span class="tag tag-control">تحكم</span></td></tr>
+        <tr><td>DC Motor</td><td>12V / 300RPM</td><td>2</td><td class="price">~$6</td><td><span class="tag tag-control">تحكم</span></td></tr>
+        <tr><td>Neo-6M GPS</td><td>مع Antenna</td><td>1</td><td class="price">~$5</td><td><span class="tag tag-sensor">حساس</span></td></tr>
+        <tr><td>Photo Encoder</td><td>LM393 / 5V</td><td>1</td><td class="price">35 جنيه</td><td><span class="tag tag-sensor">حساس</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">🔌 توصيلات وأدوات</h3>
+  <div class="table-wrap mb-20">
+    <table>
+      <thead><tr><th>القطعة</th><th>الكمية</th><th>السعر</th><th>النوع</th></tr></thead>
+      <tbody>
+        <tr><td>Breadboard كبير</td><td>1</td><td class="price">~$3</td><td><span class="tag tag-connect">توصيل</span></td></tr>
+        <tr><td>Jumper Wires (م/م + م/ن)</td><td>2 مجموعة</td><td class="price">~$4</td><td><span class="tag tag-connect">توصيل</span></td></tr>
+        <tr><td>USB to TTL</td><td>1</td><td class="price">~$3</td><td><span class="tag tag-connect">توصيل</span></td></tr>
+        <tr><td>LED Strip أبيض 5V</td><td>50cm</td><td class="price">~$3</td><td><span class="tag tag-connect">توصيل</span></td></tr>
+        <tr><td>Fuse 5A + Holder</td><td>2</td><td class="price">~$2</td><td><span class="tag tag-connect">توصيل</span></td></tr>
+        <tr>
+          <td><strong>📦 المجموع الكلي التقريبي</strong></td>
+          <td></td>
+          <td class="price" style="font-size:1.1em;"><strong>~$87</strong></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box">
+    🏪 <strong>ابدأ أولاً من رام للإلكترونيات بهذه القطع:</strong> ESP32-CAM × 3 + ESP32 DevKit + USB to TTL + Jumper Wires + Breadboard — ستتمكن من بدء اختبار الكود مباشرة!
+  </div>
+</div>
+
+<!-- ============================================================
+     19. DEMO SCENARIO
+     ============================================================ -->
+<div class="section" id="demo">
+  <div class="section-header">
+    <div class="section-icon">🎬</div>
+    <div>
+      <div class="section-title">Demo Scenario</div>
+      <div class="section-subtitle">سيناريو العرض أمام اللجنة</div>
+    </div>
+    <span class="section-label">DEMO-001</span>
+  </div>
+
+  <div class="steps-list">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>🖥️ تشغيل النظام الكامل</h4>
+        <p>تشغيل <code>node server.js</code> + <code>python analysis.py</code> + React Dashboard على نفس الـ Laptop</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>🚂 تشغيل القطار على الماكيت</h4>
+        <p>القطار يتحرك على المسار الخشبي — الكاميرتان تبدآن البث الفوري للـ Laptop عبر WiFi</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>🔍 اكتشاف عيب LOW: مسمار ناقص</h4>
+        <p>YOLOv8 يكتشف missing_bolt بثقة 0.87 — تنبيه أصفر يظهر على الداشبورد — يُسجَّل في قاعدة البيانات</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>⚠️ اكتشاف عيب MEDIUM: شرخ صغير</h4>
+        <p>YOLO يكتشف crack + SSIM Score = 0.76 (أقل من 0.85) → تنبيه برتقالي → توصية بتقليل السرعة</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>🚨 اكتشاف عيب HIGH: كسر كامل</h4>
+        <p>broken_rail بثقة 0.93 → <strong>EMERGENCY STOP</strong> يُرسَل فوراً → القطار يتوقف → Dashboard يُظهر الموقع على الخريطة بدقيقة</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h4>📊 عرض التقارير والتحليلات</h4>
+        <p>الداشبورد يعرض مسار القطار الكامل · أماكن العيوب على الخريطة · رسم بياني للتحليل · تقرير PDF للصيانة</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="warn-box mt-20">
+    ⏱️ <strong>وقت Demo المُقترح: 5-7 دقائق</strong> — من أول تشغيل حتى عرض التقارير أمام اللجنة. جهّز عيوباً مصطنعة واضحة بالمنشار والغراء لضمان اكتشاف سريع وواضح.
+  </div>
+</div>
+
+<!-- ============================================================
+     20. COMMUNICATION SETUP
+     ============================================================ -->
+<div class="section" id="comm">
+  <div class="section-header">
+    <div class="section-icon">📡</div>
+    <div>
+      <div class="section-title">Communication Setup</div>
+      <div class="section-subtitle">إعداد الشبكة وترتيب التشغيل</div>
+    </div>
+    <span class="section-label">NET-001</span>
+  </div>
+
+  <div class="table-wrap mb-20">
+    <table>
+      <thead><tr><th>الجهاز</th><th>الـ IP</th><th>البروتوكول</th><th>البيانات</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Laptop Server</strong></td><td>192.168.1.100</td><td>HTTP + WebSocket</td><td>المدير الرئيسي للنظام</td></tr>
+        <tr><td>ESP32-CAM #1 (أمامية)</td><td>192.168.1.101</td><td>HTTP Stream (MJPEG)</td><td>فيديو السكة قبل المرور</td></tr>
+        <tr><td>ESP32-CAM #2 (خلفية)</td><td>192.168.1.102</td><td>HTTP Stream (MJPEG)</td><td>فيديو السكة بعد المرور</td></tr>
+        <tr><td>ESP32 DevKit (تحكم)</td><td>192.168.1.103</td><td>WebSocket Client</td><td>سرعة + موقع + تلقي أوامر</td></tr>
+        <tr><td><strong>React Dashboard</strong></td><td>192.168.1.100:5173</td><td>WebSocket + REST</td><td>عرض + تحكم + تحليل</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">🚀 ترتيب التشغيل</h3>
+  <div class="steps-list">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><h4>شغّل Node.js Backend</h4><p><code>cd backend && node server.js</code> — Port 3000 · تأكد من اتصال MongoDB</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><h4>شغّل Python AI Pipeline</h4><p><code>python analysis.py</code> — يستقبل الكاميرتين ويشغّل YOLOv8 + SSIM</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><h4>شغّل ESP32-CAM #1 و #2</h4><p>سجّل الـ IP من Serial Monitor وحدّثه في كود Python</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><h4>شغّل ESP32 DevKit (التحكم)</h4><p>يتصل بـ Laptop WebSocket تلقائياً عند التشغيل</p></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-body"><h4>افتح React Dashboard</h4><p><code>cd dashboard && npm run dev</code> — http://localhost:5173</p></div></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     21. RESEARCH REFERENCES
+     ============================================================ -->
+<div class="section" id="refs">
+  <div class="section-header">
+    <div class="section-icon">📚</div>
+    <div>
+      <div class="section-title">Research References</div>
+      <div class="section-subtitle">المراجع البحثية والمصادر العلمية</div>
+    </div>
+    <span class="section-label">REF-001</span>
+  </div>
+
+  <ul class="fancy-list">
+    <li><strong>Redmon et al. (2016)</strong> — "You Only Look Once: Unified, Real-Time Object Detection" · CVPR · أساس YOLOv8</li>
+    <li><strong>Jocher et al. (2023)</strong> — "Ultralytics YOLOv8" · GitHub · الموديل المستخدم في المشروع</li>
+    <li><strong>Wang et al. (2004)</strong> — "Image Quality Assessment: From Error Visibility to Structural Similarity" · IEEE TIP · أساس SSIM</li>
+    <li><strong>Espressif Systems (2024)</strong> — ESP32 Technical Reference Manual · الـ Microcontroller الرئيسي</li>
+    <li><strong>Roboflow Universe</strong> — Rail Defect Detection Dataset · مصدر بيانات التدريب</li>
+    <li><strong>Kaur & Singh (2020)</strong> — "Automated Rail Track Inspection Using Image Processing" · IJCA · مراجع مقارنة</li>
+    <li><strong>European Union Agency for Railways (2023)</strong> — Annual Safety Report · إحصاءات السلامة</li>
+    <li><strong>Bradski & Kaehler (2008)</strong> — "Learning OpenCV" · O'Reilly Media · مرجع OpenCV</li>
+    <li><strong>World Bank (2022)</strong> — "Railway Safety and Maintenance Cost Analysis" · مرجع التأثير الاقتصادي</li>
+    <li><strong>He et al. (2022)</strong> — "Automated Defect Detection on Railway Track Using Deep Learning" · Sensors · MDPI</li>
+  </ul>
+</div>
+
+</div><!-- end .container -->
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="footer-title">🚆 DPRIMS</div>
+  <div style="color:#64748B; font-size:.9em;">Dual-Phase Rail Inspection &amp; Monitoring System</div>
+  <div class="footer-sub">مشروع تخرج 2026 · AI + Computer Vision + ESP32 + Solar Power</div>
+  <div class="footer-sub" style="margin-top:12px; color:#475569;">
+    Built with ❤️ by 0xmaro & Ahmed
+  </div>
+</footer>
+
+</body>
+</html>
