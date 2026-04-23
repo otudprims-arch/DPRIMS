@@ -1,5 +1,5 @@
 # نظام إدارة معهد ريادة الغد — MVP
-## Phase 01 (Foundation) + Phase 02 (Master Data)
+## Phase 01 + 02 + 03 (Registration & Applications)
 
 ---
 
@@ -16,6 +16,8 @@
 createdb riyadat_db
 psql riyadat_db < backend/src/db/schema.sql
 psql riyadat_db < backend/src/db/seed.sql
+psql riyadat_db < backend/src/db/migration_v2.sql  # Manager/HR + logo
+psql riyadat_db < backend/src/db/migration_v3.sql  # Registration forms + applications
 ```
 
 ### 2. تشغيل الـ Backend
@@ -200,3 +202,55 @@ psql $DATABASE_URL -f backend/src/db/schema.sql && psql $DATABASE_URL -f backend
 - **Audit Logs** واجهة مع فلاتر (الإجراء والكيان).
 - **Bulk Renewal**: واجهة تحديد متعدد + endpoint transactional لتجديد عقود N من الشركات لـ M شهر.
 - **قوائم العرض** أصبحت تعرض أسماء الكيانات المرتبطة (الشركة، القسم، البرنامج) بدل الـ UUID الخام.
+
+---
+
+## Phase 03 — Registration & Applications
+
+### الميزات الجديدة
+- **بانئ النموذج** (`/form-builder`) — `super_admin` فقط. إنشاء أقسام وحقول ديناميكية + وضع معاينة.
+- **روابط التسجيل** (`/registration-links`) — إنشاء رابط عام لكل برنامج/مجموعة مع كود مختصر + انتهاء صلاحية + حد أقصى + عدّاد.
+- **صفحة التسجيل العامة** (`/register/:code`) — بدون تسجيل دخول، Mobile-first من 360px، رفع صورة (2MB jpeg/png/webp).
+- **مراجعة الطلبات** (`/admin/applications`) — فلترة + عرض تفاصيل + أزرار قبول/رفض/طلب معلومات/ترقية من الانتظار.
+- **مراجعة تلقائية** (`autoReview.js`) — فحص قوائم الحظر، النوع، العمر، السعة → تُرجّع الحالة المبدئية.
+- **قبول الطلب**: يتم في transaction — إنشاء `user` (username=national_id, role=trainee) + `trainee` + زيادة `current_trainees` + إرجاع كلمة مرور مؤقتة تُعرض مرة واحدة فقط.
+
+### التبعيات الجديدة
+```bash
+cd backend
+npm install multer
+```
+
+### Rate Limiting
+الـ endpoints العامة `/api/public/*` محدودة بـ **30 طلب / 15 دقيقة / IP**.
+
+### رفع الصور
+- المسار: `backend/uploads/photos/`
+- الحجم الأقصى: 2MB
+- الأنواع: jpeg, png, webp
+- يُخدم عبر `/uploads/photos/<filename>`
+
+### جداول Phase 03 الجديدة
+| الجدول | الوصف |
+|--------|-------|
+| `registration_links` | روابط التسجيل (code, expiry, limits) |
+| `form_sections` | أقسام النموذج |
+| `form_fields` | حقول النموذج (text/select/file/...) |
+| `applications` | الطلبات المقدمة |
+| `trainees` | المتدربون (skeleton — يُكتمل في Phase 04) |
+| `blocked_profiles` | قائمة حظر (رقم قومي/هاتف/بريد) |
+
+### BullMQ (Placeholders)
+الإشعارات حاليًا مجرد `console.log` في انتظار Phase لاحقة:
+- `send-approval-notification` (على القبول)
+- `send-rejection-notification` (على الرفض)
+- `send-info-request-notification` (على طلب معلومات)
+
+### صلاحيات الوصول
+| المسار | الأدوار |
+|--------|---------|
+| `/form-builder` | super_admin |
+| `/registration-links` | super_admin + manager |
+| `/applications` | الكل (tenant-scoped) |
+| `/api/applications/:id/approve` | super_admin + manager |
+| `/api/applications/:id/reject` | super_admin + manager |
