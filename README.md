@@ -157,7 +157,37 @@ riyadat-mvp/
 
 ---
 
-## 🆕 التغييرات في هذا الإصدار
+## 🆕 التغييرات في الإصدار v3
+
+### إضافات بيانات الشركة
+- **رفع شعار الشركة** (PNG/JPG/WEBP/SVG, حتى 2MB) — `POST /api/companies/:id/logo`
+- حقول **مدير الشركة**: `manager_name`, `manager_phone`, `manager_email`
+- حقول **مسؤول HR**: `hr_name`, `hr_phone`, `hr_email`
+- الحقول الجديدة معروضة في جدول الشركات + نموذج الإنشاء/التعديل (مقسّم لعدة sections)
+
+### إصلاحات
+- ✅ **`/api/auth/change-password` 404** — كان في نسخة قديمة. الـ controller والـ route مفعلان الآن.
+- ✅ **`/api/companies/bulk-renew` 404** — تم ترتيب الـ route قبل `/:id` لتجنب التطابق. كما أصبح يقبل `extend_months` أو `months`.
+- ✅ **`/api/lookups/companies?id=...` 404** — تمت إضافة دعم `?id=` في جميع lookup endpoints لجلب صف واحد.
+- ✅ **UUID invalid** — الآن يتم فحص الـ UUID في الـ backend والـ frontend قبل إرسال الطلب.
+- ✅ **SearchableSelect يستدعي `?q=` قبل تسجيل الدخول** — الآن يتحقق من وجود access_token أولاً.
+
+### مهم: إذا تشغل نسخة قاعدة بيانات سابقة
+شغّل ملف الـ migration **مرة واحدة** لإضافة الحقول الجديدة:
+```bash
+psql $DATABASE_URL -f backend/src/db/migration_v2.sql
+```
+
+أو إذا في بيئة اختبار وتقدر تعيد بناء القاعدة:
+```bash
+psql $DATABASE_URL -f backend/src/db/schema.sql && psql $DATABASE_URL -f backend/src/db/seed.sql
+```
+
+بعد التحديث أعد تشغيل الـ backend: `npm run dev` في مجلد backend.
+
+---
+
+## 🆕 التغييرات في الإصدار v2
 
 - **Sidebar بأيقونات SVG** (Heroicons outline) مكان الشريط العلوي، مع تكيف مع شاشات الموبايل، وزر طي/فرد
 - **`SearchableSelect` component** يستبدل كل حقول UUID:
