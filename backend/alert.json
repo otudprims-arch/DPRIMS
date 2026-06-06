@@ -1,0 +1,23 @@
+{
+  "type": "rail_defect",
+  "timestamp": 1710000000000,
+  "train_id": "Train01",
+  "camera": "front",
+  "frame_id": "front_000123",
+  "track_position_cm": 125.4,
+  "speed_cm_s": 41,
+  "direction": "forward",
+  "gps": {
+    "lat": 30.123456,
+    "lng": 31.123456
+  },
+  "defects": [
+    {
+      "class_id": 0,
+      "class_name": "crack",
+      "confidence": 0.87,
+      "bbox": [4, 5, 6, 7]
+    }
+  ],
+  "ssim_anomaly_score": 0.22
+}

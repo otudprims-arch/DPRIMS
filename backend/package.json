@@ -1,0 +1,31 @@
+{
+  "name": "dprims-backend",
+  "version": "1.0.0",
+  "description": "Backend for DPRIMS rail inspection system",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "dprims",
+    "express",
+    "socket.io",
+    "mongodb",
+    "rail-ai"
+  ],
+  "author": "otudprims-arch",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "mongoose": "^8.23.1",
+    "socket.io": "^4.8.3",
+    "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
