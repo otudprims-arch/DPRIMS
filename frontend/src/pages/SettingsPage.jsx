@@ -53,7 +53,7 @@ export default function SettingsPage() {
 
       <section className="system-health-hero">
         <div>
-          <span className="hero-kicker">DPRIMS SYSTEM CENTER</span>
+          <span className="hero-kicker">DPATIMS SYSTEM CENTER</span>
           <h2>مراقبة حالة الخدمات والاتصالات في الزمن الحقيقي</h2>
           <p>
             هذه الصفحة تعرض حالة الباك إند، قاعدة البيانات، DevKit، Python AI Pipeline، وآخر الأحداث التشغيلية.
@@ -132,7 +132,7 @@ export default function SettingsPage() {
           <ServiceRow
             label="Backend API"
             connected={backendOk}
-            details={health?.service || 'dprims-backend'}
+            details={health?.service || 'DPATIMS-backend'}
           />
           <ServiceRow
             label="MongoDB"

@@ -67,7 +67,7 @@ export default function ReportPrintView({ reportTitle, data, summary }) {
         {/* Header */}
         <div className="print-header">
           <div>
-            <span className="print-kicker">DPRIMS Smart Railway Inspection</span>
+            <span className="print-kicker">DPATIMS Smart Railway Inspection</span>
             <h1>{reportTitle || 'Rail Inspection Executive Report'}</h1>
             <p className="print-sub">
               AI-generated operational summary for alerts, confirmed faults,
@@ -77,7 +77,7 @@ export default function ReportPrintView({ reportTitle, data, summary }) {
 
           <div className="print-meta">
             <div><strong>Date:</strong> {fmtDate(new Date())}</div>
-            <div><strong>System:</strong> DPRIMS Dashboard</div>
+            <div><strong>System:</strong> DPATIMS Dashboard</div>
             <div><strong>Sessions:</strong> {sessions.length}</div>
           </div>
         </div>
@@ -245,7 +245,7 @@ export default function ReportPrintView({ reportTitle, data, summary }) {
         {/* Footer */}
         <div className="print-footer">
           <span>Generated automatically from AI alerts, confirmed faults, and maintenance records</span>
-          <strong>DPRIMS Smart Railway Inspection</strong>
+          <strong>DPATIMS Smart Railway Inspection</strong>
         </div>
       </div>
     </div>

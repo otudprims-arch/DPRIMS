@@ -25,7 +25,7 @@ export default function Topbar({ onMenuToggle, health }) {
     return () => clearInterval(id);
   }, []);
 
-  const page = PAGE_TITLES[location.pathname] || { title: 'DPRIMS', sub: '' };
+  const page = PAGE_TITLES[location.pathname] || { title: 'DPATIMS', sub: '' };
 
   const dbOk = health?.database === 'connected';
   const devkitOk = Boolean(health?.realtime?.devkit_connected);

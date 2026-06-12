@@ -242,7 +242,7 @@ export default function DashboardHome() {
     <div className="page-stack dashboard-pro-page">
       <section className={`hero-dashboard pro-dashboard-hero ${systemReady ? 'online' : 'warning'}`}>
         <div className="hero-copy">
-          <span className="hero-kicker">DPRIMS LIVE COMMAND CENTER</span>
+          <span className="hero-kicker">DPATIMS LIVE COMMAND CENTER</span>
           <h2>منصة فحص ذكية تجمع القطار والكاميرات والـ AI والصيانة في لوحة واحدة</h2>
           <p>
             متابعة لحظية لحركة القطار، صحة النظام، التنبيهات الحرجة، الجلسة الحالية، وخريطة المسار الرقمية.

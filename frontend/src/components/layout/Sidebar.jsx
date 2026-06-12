@@ -52,7 +52,7 @@ export default function Sidebar({ open, onClose, isConnected }) {
         </div>
 
         <div>
-          <h2>DPRIMS</h2>
+          <h2>DPATIMS</h2>
           <p>AI Rail Inspection System</p>
         </div>
       </div>

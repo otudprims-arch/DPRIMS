@@ -663,7 +663,7 @@ export default function TrackView({
             fontWeight="900"
             fontFamily="var(--font)"
           >
-            DPRIMS TRAIN
+            DPATIMS TRAIN
           </text>
 
           <g>
